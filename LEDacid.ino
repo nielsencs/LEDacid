@@ -12,10 +12,16 @@
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_DOTS, PIN, NEO_RGB + NEO_KHZ800);
 
 byte iUp = 1;
+byte iSection = 0;
 byte iColWheelPos = 0;
 uint32_t iColGold;
 uint32_t iColWhite;
 uint32_t iColRed;
+
+unsigned long previousMillis = 0;        // will store last time LED was updated
+
+const long interval = 7000;           // interval at which to blink (milliseconds)
+
 // ======================================================================
 void setup() {
 // ======================================================================
@@ -33,36 +39,60 @@ void setup() {
 // ======================================================================
 void loop() {
 // ======================================================================
-//  colorWipe(strip.Color(255, 0, 0), 100); // Red
-//  colorWipe(strip.Color(0, 255, 0), 75); // Green
-//  colorWipe(strip.Color(0, 0, 255), 50); // Blue
-//  colorWipe(strip.Color(255, 255, 255), 10); // White
+  unsigned long currentMillis = millis();
 
-//  whiteOverRainbow(20,75,5);  
+  if (currentMillis - previousMillis >= interval) {
+    // save the last time you blinked the LED
+    previousMillis = currentMillis;
 
-//  pulseWhite(5);
-
-//  rainbowFade2White(3,3,1);
-//  rainbowCycle(0);
-
-//  oneAllOtherCascade( strip.Color(0, 255, 0),  strip.Color(255, 255, 255));
-//  oneAllOtherCascade( strip.Color(255, 0, 0),  strip.Color(128, 255, 0));
-//  oneAllOtherCascade( strip.Color(0, 0, 255),  strip.Color(0, 255, 0));
-
-//  simpleCycle();
-//  colourSet(255, strip.Color(64, 0, 0));
-
-  colourSet(255, Wheel(iColWheelPos));
-  iColWheelPos++; // since this is a 'byte' will keep cycling from 0 to 255
-  delay(700);
-
-//  sparkle(1000);
-//  colourSet(255, Wheel(15));
-//  fireLight(1000, 0);
-//  colourSet(255, 0); // blank all
-
-//  santaHat();
-//  delay(10000);
+    iSection++;
+  }
+  switch(iSection){
+    case 0:
+      colorWipe(strip.Color(255, 0, 0), 100); // Red
+      colorWipe(strip.Color(0, 255, 0), 75); // Green
+      colorWipe(strip.Color(0, 0, 255), 50); // Blue
+      colorWipe(strip.Color(255, 255, 255), 10); // White
+      break;
+    case 1:
+      whiteOverRainbow(20,75,5);  
+      break;
+    case 12:
+      break;
+    case 13:
+      colourSet(255, Wheel(15));
+      fireLight(1000, 0);
+      break;
+    case 4:
+      oneAllOtherCascade( strip.Color(0, 255, 0),  strip.Color(255, 255, 255));
+      oneAllOtherCascade( strip.Color(255, 0, 0),  strip.Color(128, 255, 0));
+      oneAllOtherCascade( strip.Color(0, 0, 255),  strip.Color(0, 255, 0));
+      break;
+    case 5:
+      colourSet(255, 0); // blank all
+      sparkle(1000);
+      break;
+    case 6:
+      colourSet(255, Wheel(iColWheelPos));
+      iColWheelPos++; // since this is a 'byte' will keep cycling from 0 to 255
+      delay(700);
+      break;
+    case 7:
+      rainbowFade2White(3,3,1);
+      break;
+    case 8:
+      simpleCycle();
+      break;
+    case 9:
+      rainbowCycle(0);
+      break;
+    case 10:
+      santaHat();
+      break;
+    default:
+      iSection = 0;
+      break;
+  }
 }
 
 // ======================================================================
@@ -186,26 +216,6 @@ void colorWipe(uint32_t c, byte iDelay) { // Fill the dots one after the other w
     colourSet(i, c);
     delay(iDelay);
   }
-}
-
-// ======================================================================
-void pulseWhite(byte iDelay) {
-// ======================================================================
-  for(byte j = 0; j < 256 ; j++){
-      for(byte i=0; i<NUM_DOTS; i++) {
-          strip.setPixelColor(i, strip.Color(128, 128, 128) );
-        }
-        delay(iDelay);
-        strip.show();
-      }
-
-  for(byte j = 255; j >= 0 ; j--){
-      for(byte i=0; i<NUM_DOTS; i++) {
-          strip.setPixelColor(i, strip.Color(128, 128, 128) );
-        }
-        delay(iDelay);
-        strip.show();
-      }
 }
 
 // ======================================================================
