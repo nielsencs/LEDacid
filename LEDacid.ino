@@ -1,9 +1,12 @@
 /*
+LEDacid - adding a bit more 'ooooh' to Christmas tree lights
+
+Proposed modes:
 -standard Christmas tree lights for a bit - white pulse or flash or colour cycle - one colour per dot 
   then white band travels up tree, turns golden and grows down to fill tree
 -starlight sparkle
 */
-#include <Adafruit_NeoPixel.h>
+#include <Adafruit_NeoPixel.h> // ought to get FastLED working.
 
 #define PIN 5
 #define BRIGHTNESS 20
@@ -13,7 +16,7 @@ const byte iStripLength = 100; // max 254 unless vars changed from 'byte' - 255 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(iStripLength, PIN, NEO_RGB + NEO_KHZ800);
 
 byte iUp = 1;
-byte iSection = 0;
+byte iMode = 0;
 byte iColWheelPos = 0;
 
 uint32_t iColGold;
@@ -43,11 +46,11 @@ void loop() {
 
   if (iCurMillisecs - iPreMillisecs >= interval) {
     iPreMillisecs = iCurMillisecs;
-    iSection++;
+    iMode++;
   }
-  iSection = 5; // comment out to cycle through all modes
+  iMode = 4; // comment out to cycle through all modes
 
-  switch(iSection){
+  switch(iMode){
     case 0:
       colorWipe(strip.Color(255, 0, 0), 100); // Red
       colorWipe(strip.Color(0, 255, 0), 75); // Green
@@ -99,7 +102,7 @@ void loop() {
       test();
       break;
     default:
-      iSection = 0;
+      iMode = 0;
       break;
   }
 }
