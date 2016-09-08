@@ -39,13 +39,25 @@ Proposed modes:
 #include <platforms.h>
 #include <power_mgt.h>
 // ==== FastLED includes =======================================================
+#include <ESP8266WiFi.h>
 
 #define DATA_PIN 5
-#define BRIGHTNESS 20
+const byte BRIGHTNESS = 30;
 
 const byte iStripLength = 100; // max 254 unless vars changed from 'byte' - 255 used to set whole strip
 
-//Adafruit_NeoPixel strip = Adafruit_NeoPixel(iStripLength, DATA_PIN, NEO_RGB + NEO_KHZ800);
+const byte iModeSantaHat = 1;
+const byte iModeSlowRainbow = 0;
+
+const char* tSSID = "SKYA7448";
+const char* tPass = "BXTYCFUS";
+//const char* tSSID = "MiSMK";
+//const char* tPass = "3M3n1nSh3ds12";
+ 
+WiFiServer server(80);
+
+boolean bLEDsOn=false;
+
 // This is an array of leds.  One item for each led in your strip.
 //CRGB leds[iStripLength];
 CRGBArray<iStripLength> leds;
@@ -62,14 +74,14 @@ unsigned long iPreMillisecs = 0;
 // =============================================================================
 void setup() {
 // =============================================================================
-  delay(1000); // sanity check delay - allows reprogramming if accidently blowing power w/leds
+  FastLED.delay(1000); // sanity check delay - allows reprogramming if accidently blowing power w/leds
 
 // Uncomment one of the following lines for your leds arrangement.
   // FastLED.addLeds<TM1803, DATA_PIN, RGB>(leds, iStripLength);
   // FastLED.addLeds<TM1804, DATA_PIN, RGB>(leds, iStripLength);
   // FastLED.addLeds<TM1809, DATA_PIN, RGB>(leds, iStripLength);
   // FastLED.addLeds<WS2811, DATA_PIN, RGB>(leds, iStripLength);
-   FastLED.addLeds<WS2812, DATA_PIN, RGB>(leds, iStripLength);
+  FastLED.addLeds<WS2812, DATA_PIN, RGB>(leds, iStripLength);
   // FastLED.addLeds<WS2812B, DATA_PIN, RGB>(leds, iStripLength);
   // FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, iStripLength);
   // FastLED.addLeds<APA104, DATA_PIN>(leds, iStripLength);
@@ -93,46 +105,187 @@ void setup() {
   // FastLED.addLeds<APA102, DATA_PIN, CLOCK_PIN, RGB>(leds, iStripLength);
   // FastLED.addLeds<DOTSTAR, DATA_PIN, CLOCK_PIN, RGB>(leds, iStripLength);
 
-//  Serial.begin(115200);
-//  Serial.println("Starting up...");
+  Serial.begin(115200);
+  FastLED.delay(10);
+ 
   FastLED.setBrightness(BRIGHTNESS);
 
 // = countdown =================================================================
   for (byte i = 5; i > 0; i--){
     leds[i-1] = CRGB::Red;
     FastLED.show();
-    delay(700);
+    FastLED.delay(700);
     leds[i-1] = CRGB::Black;
     FastLED.show();
-    delay(300);
+    FastLED.delay(300);
   }
 // = countdown =================================================================
+  // Connect to WiFi network
+  Serial.println();
+  Serial.println();
+  Serial.print("Connecting to ");
+  Serial.println(tSSID);
+ 
+  WiFi.begin(tSSID, tPass);
+ 
+  while (WiFi.status() != WL_CONNECTED) {
+    FastLED.delay(500);
+    Serial.print(".");
+  }
+  Serial.println("");
+  Serial.println("WiFi connected");
+ 
+  // Start the server
+  server.begin();
+  Serial.println("Server started");
+ 
+  // Print the IP address
+  Serial.print("Use this URL : ");
+  Serial.print("http://");
+  Serial.print(WiFi.localIP());
+  Serial.println("/");
 }
 // =============================================================================
 void loop() {
 // =============================================================================
-  unsigned long iCurMillisecs = millis();
+  doWeb();
+  if (bLEDsOn){
+    doLEDs();
+  }else{
+    for(int i = 0; i < iStripLength/2; i++) {   
+      // fade everything out
+      leds.fadeToBlackBy(20);
+      FastLED.delay(33);
+    }
+  }
+}
+// =============================================================================
+void doWeb() {
+// =============================================================================
+  // Check if a client has connected
+  WiFiClient client = server.available();
+  if (!client) {
+    return;
+  }
+ 
+  // Wait until the client sends some data
+  Serial.println("new client");
+  while(!client.available()){
+    FastLED.delay(1);
+  }
+ 
+  // Read the first line of the request
+  String request = client.readStringUntil('\r');
+  Serial.println(request);
+  client.flush();
+ 
+  // Match the request
+ 
+  if (request.indexOf("/LED=0") != -1) {
+    bLEDsOn=true;
+    iMode = 0;
+  } 
+  if (request.indexOf("/LED=1") != -1) {
+    bLEDsOn=true;
+    iMode = 1;
+  } 
+  if (request.indexOf("/LED=2") != -1) {
+    bLEDsOn=true;
+    iMode = 2;
+  } 
+  if (request.indexOf("/LED=999") != -1){
+    bLEDsOn=false;
+    iMode = 0;
+  }
+
+  // Return the response
+  client.println("HTTP/1.1 200 OK");
+  client.println("Content-Type: text/html");
+  client.println(""); //  do not forget this one
+// = Marvin menu ===============================================================
+  client.println("<!DOCTYPE html>");
+  client.println("<html>");
+  client.println("  <head>");
+  client.println("    <meta charset=\"UTF-8\">");
+  client.println("    <title>LEDacid Menu</title>");
+  client.println("    <style>");
+  client.println("* {margin: 0; padding:0; box-sizing: border-box; font-family: 'Helvetica', Arial; font-weight: bold;}");
+  client.println("body { background-color: #EEE; }");
+  client.println("#list {");
+  client.println("  display: block;");
+  client.println("  list-style-type: none;");
+  client.println("  padding: 0;");
+  client.println("  overflow: hidden;");
+  client.println("}");
+  client.println("#list li {");
+  client.println("  margin: 1%;");
+  client.println("  margin-bottom: 10px;");
+  client.println("}");
+  client.println("@media only screen and (min-width: 650px) {");
+  client.println("  #list li {");
+  client.println("    float: left; width: 48%;");
+  client.println("  }");
+  client.println("}");
+  client.println("#list li a {");
+  client.println("  background: #FFF;");
+  client.println("  color: #D00;");
+  client.println("  border-radius: 10px;");
+  client.println("  box-shadow: 0 3px 10px #CCC;");
+  client.println("  border: solid 1px #CCC;");
+  client.println("  display: block;");
+  client.println("  padding: 10px;");
+  client.println("  text-align: center;");
+  client.println("  text-decoration: none;");
+  client.println("}");
+  client.println("#list li a:hover {");
+  client.println("  border: solid 1px #000;");
+  client.println("  color: #000;");
+  client.println("}");
+  client.println("#list li a:active {");
+  client.println("  background-color: #FFC;");
+  client.println("}   </style>");
+  client.println("  </head>");
+  client.println("  <body>");
+  client.println("    <ul id=\"list\">");
+  client.println("      <li><a href='LED=0'>Slow Rainbow</a></li>");
+  client.println("      <li><a href='LED=1'>Rainbow Twinkle</a></li>");
+  client.println("      <li><a href='LED=2'>Santa&lsquo;s Hat</a></li>");
+  client.println("      <li><a href='LED=999'>Turn &lsquo;em off</a></li>");
+  client.println("    </ul>");
+  client.println("  </body>");
+  client.println("</html>");
+// = Marvin menu ===============================================================
+
+  FastLED.delay(1);
+  Serial.println("Client disconnected");
+  Serial.println("");
+}
+// =============================================================================
+void doLEDs(){
+// =============================================================================  
+/*  unsigned long iCurMillisecs = millis();
 
   if (iCurMillisecs - iPreMillisecs >= interval) {
     iPreMillisecs = iCurMillisecs;
     iMode++;
   }
-  iMode = 3; // comment out to cycle through all modes
+//  iMode = 1; // comment out to cycle through all modes
+*/
 
   switch (iMode){
     case 0:
       byte iHue;
       for(byte i = 0; i < iStripLength; i++){
         //iHue = iHueMain;
-        iHue = iHueMain + int(i/3);
+        iHue = iHueMain + i;
         leds[i] = CHSV(iHue, 255, 255);
       }
       FastLED.show();
       iHueMain++; // since this is a 'byte' will keep cycling from 0 to 255
-      delay(70);
+      FastLED.delay(70);
       break;
     case 1:
-      sparkle(100, 100);
+      rainbowTwinkle();
       break;
     case 2:
       santaHat();
@@ -164,6 +317,9 @@ void loop() {
       break;
     case 7:
       rainbowFade2White(3,3,1);
+      break;
+    case 18:
+      sparkle(100, 100);
       break;
     case 19:
       simpleCycle();
@@ -197,14 +353,30 @@ void loop() {
   }
 }
 // =============================================================================
+void rainbowTwinkle(){
+// =============================================================================
+//  byte iDot = random8(0,iStripLength);
+
+  for (byte i = 0; i < 255; i++){
+    leds[random8(0,iStripLength)] = CHSV(i, 255, 255);
+//    leds[random8(0,iStripLength)] += CHSV(8, 0, 0);
+//    leds[random8(0,iStripLength)] += CHSV(8, 0, 0);
+//    leds[random8(0,iStripLength)] += CHSV(8, 0, 0);
+    leds[random8(0,iStripLength)] += CHSV(8, 0, 0);
+//    leds[iDot] = CHSV(i, 255, 8);
+//    leds[iDot] += CHSV(i, 255, 8);
+    FastLED.show();        
+  }
+}
+// =============================================================================
 void test(){
 // =============================================================================
   uint32_t c = CRGB(255, 255, 255);
   colourSet(255, CRGB(255, 255, 255));
-  delay(1000);
+  FastLED.delay(1000);
 //  for (byte i = 1; i < 101; i++){
 //    colourSet(255, int((CRGB(255, 0, 0)*i)/100));
-//    delay(500);
+//    FastLED.delay(500);
 //  }
   do{
     colourSet(255, c);
@@ -212,7 +384,7 @@ void test(){
   }while(c>0);
 
   colourSet(255, 0); // blank all
-  delay(1000);
+  FastLED.delay(1000);
 }
 // =============================================================================
 void colourSet(byte iDot, uint32_t c) { // set specific dot (or if iDot = -1 all dots) to one colour
@@ -260,7 +432,7 @@ void oneAllOtherCascade(uint32_t iColAll, uint32_t iColCascade){
 
   for(byte i=0; i < iStripLength; i++) {
     colourSet(i, iColCascade);
-    delay(200);
+    FastLED.delay(200);
     colourSet(i, iColAll);
   }
 }
@@ -296,7 +468,7 @@ void simpleCycle() {
           FastLED.show();
           break;
       }
-//      delay(70);
+//      FastLED.delay(70);
     }
 
     if(iUp == 0){
@@ -315,14 +487,14 @@ void simpleCycle() {
 // =============================================================================
 void sparkle(unsigned int iCount, byte iBrightness) {
 // =============================================================================
-  FastLED.setBrightness(iBrightness);
+//  FastLED.setBrightness(iBrightness);
   for (unsigned int i = 0; i < iCount; i++){
     sparkle2(CRGB::White);
     sparkle2(CRGB::Gold);
     //sparkle2(CRGB(255, 192,  32));
     //sparkle2(Wheel(random(0, 256))); // rainbow
   }
-  FastLED.setBrightness(BRIGHTNESS);
+//  FastLED.setBrightness(BRIGHTNESS);
 }
 // =============================================================================
 void sparkle2(uint32_t iColour) {
@@ -332,7 +504,7 @@ void sparkle2(uint32_t iColour) {
 
 
   colourSet(iDot, iColour);
-  //delay(70);
+  //FastLED.delay(70);
   colourSet(iDot, iCurrColour);
 }
 // =============================================================================
@@ -340,7 +512,7 @@ void colorWipe(uint32_t c, byte iDelay) { // Fill the dots one after the other w
 // =============================================================================
   for(byte i=0; i<iStripLength; i++) {
     colourSet(i, c);
-    delay(iDelay);
+    FastLED.delay(iDelay);
   }
 }
 // =============================================================================
@@ -372,11 +544,11 @@ void rainbowFade2White(byte iDelay, byte rainbowLoops, byte whiteLoops) {
           fadeVal--;
       }
         FastLED.show();
-        delay(iDelay);
+        FastLED.delay(iDelay);
     }  
   }
 
-  delay(500);
+  FastLED.delay(500);
 
   for(byte k = 0 ; k < whiteLoops ; k ++){
     for(byte j = 0; j < 256 ; j++){
@@ -386,7 +558,7 @@ void rainbowFade2White(byte iDelay, byte rainbowLoops, byte whiteLoops) {
       FastLED.show();
     }
 
-    delay(2000);
+    FastLED.delay(2000);
     for(byte j = 255; j >= 0 ; j--){
       for(byte i=0; i < iStripLength; i++) {
         leds[i] = CRGB(128, 128, 128);
@@ -394,7 +566,7 @@ void rainbowFade2White(byte iDelay, byte rainbowLoops, byte whiteLoops) {
       FastLED.show();
     }
   }
-  delay(500);
+  FastLED.delay(500);
 }
 // =============================================================================
 void whiteOverRainbow(byte iDelay, byte whiteSpeed, byte whiteLength ) {
@@ -434,7 +606,7 @@ void whiteOverRainbow(byte iDelay, byte whiteSpeed, byte whiteLength ) {
       head%=iStripLength;
       tail%=iStripLength;
         FastLED.show();
-        delay(iDelay);
+        FastLED.delay(iDelay);
     }
   } 
 }
@@ -448,7 +620,7 @@ void rainbowCycle(byte iDelay) { // Slightly different, this makes the rainbow e
       leds[i] = Wheel(((i * 256 / iStripLength) + j) & 255);
     }
     FastLED.show();
-    delay(iDelay);
+    FastLED.delay(iDelay);
   }
 }
 // =============================================================================
@@ -461,11 +633,11 @@ void rainbow(byte iDelay) {
       leds[i] = Wheel((i+j) & 255);
     }
     FastLED.show();
-    delay(iDelay);
+    FastLED.delay(iDelay);
   }
 }
 // =============================================================================
-void theaterChase(uint32_t c, uint8_t wait) { //Theatre-style crawling lights.
+void theaterChase(uint32_t c, uint8_t iDelay) { //Theatre-style crawling lights.
 // =============================================================================
   for (int j=0; j<10; j++) {  //do 10 cycles of chasing
     for (int q=0; q < 3; q++) {
@@ -474,7 +646,7 @@ void theaterChase(uint32_t c, uint8_t wait) { //Theatre-style crawling lights.
       }
       FastLED.show();
 
-      delay(wait);
+      FastLED.delay(iDelay);
 
       for (uint16_t i=0; i < iStripLength; i=i+3) {
         leds[i+q] = 0;        //turn every third pixel off
@@ -483,7 +655,7 @@ void theaterChase(uint32_t c, uint8_t wait) { //Theatre-style crawling lights.
   }
 }
 // =============================================================================
-void theaterChaseRainbow(uint8_t wait) { //Theatre-style crawling lights with rainbow effect
+void theaterChaseRainbow(uint8_t iDelay) { //Theatre-style crawling lights with rainbow effect
 // =============================================================================
   for (int j=0; j < 256; j++) {     // cycle all 256 colors in the wheel
     for (int q=0; q < 3; q++) {
@@ -492,7 +664,7 @@ void theaterChaseRainbow(uint8_t wait) { //Theatre-style crawling lights with ra
       }
       FastLED.show();
 
-      delay(wait);
+      FastLED.delay(iDelay);
 
       for (uint16_t i=0; i < iStripLength; i=i+3) {
         leds[i+q] = 0;        //turn every third pixel off
