@@ -163,7 +163,7 @@ CRGB gBackgroundColor = CRGB::Black;
 // If COOL_LIKE_INCANDESCENT is set to 1, colors will 
 // fade out slightly 'reddened', similar to how
 // incandescent bulbs change color as they dim down.
-#define COOL_LIKE_INCANDESCENT 1
+#define COOL_LIKE_INCANDESCENT 0
 
 
 CRGBPalette16 gCurrentPalette;
@@ -289,6 +289,7 @@ void loop() {
   if (bLEDsOn){
     doLEDs();
   }else{
+    //EVERY_N_MILLISECONDS(33) {
     for(int i = 0; i < iStripLength/2; i++) {   
       // fade everything out
       leds.fadeToBlackBy(20);
@@ -317,9 +318,13 @@ void doWeb() {
   client.flush();
  
   // Match the request
-  if (request.indexOf("/LED=") != -1) {
-    bLEDsOn=true;
-    iMode = request.substring(request.indexOf("/LED=")+5, request.indexOf(" HTTP")).toInt();
+  if (request.indexOf("/LED=999") != -1) {
+    bLEDsOn=false;
+  }else{
+    if (request.indexOf("/LED=") != -1) {
+      bLEDsOn=true;
+      iMode = request.substring(request.indexOf("/LED=")+5, request.indexOf(" HTTP")).toInt();
+    }
   }
   // Display Web Page
   client.println("HTTP/1.1 200 OK");
@@ -346,7 +351,8 @@ void doWeb() {
   client.println("}");
   client.println("@media only screen and (min-width: 650px) {");
   client.println("  #list li {");
-  client.println("    float: left; width: 48%;");
+//  client.println("    float: left; width: 48%;");
+  client.println("    float: left; width: 98%;");
   client.println("  }");
   client.println("}");
   client.println("#list li a {");
@@ -375,22 +381,22 @@ void doWeb() {
   client.println("      <li><a href='LED=2'>Santa&lsquo;s Hat</a></li>");
   client.println("      <li><a href='LED=3'>Lightning</a></li>");
   client.println("      <li><a href='LED=4'>Twinkle, Twinkle Little Star</a></li>");
-  client.println("      <li><a href='LED=5'>Sparkle</a></li>");
-  client.println("      <li><a href='LED=6'>option 06</a></li>");
-  client.println("      <li><a href='LED=7'>option 07</a></li>");
-  client.println("      <li><a href='LED=8'>option 08</a></li>");
-  client.println("      <li><a href='LED=9'>All White (subtle twinkle)</a></li>");
-  client.println("      <li><a href='LED=10'>option 10</a></li>");
-  client.println("      <li><a href='LED=11'>option 11</a></li>");
-  client.println("      <li><a href='LED=12'>option 12</a></li>");
-  client.println("      <li><a href='LED=13'>option 13</a></li>");
-  client.println("      <li><a href='LED=14'>option 14</a></li>");
-  client.println("      <li><a href='LED=15'>option 15</a></li>");
-  client.println("      <li><a href='LED=16'>option 16</a></li>");
-  client.println("      <li><a href='LED=17'>Firelight</a></li>");
-  client.println("      <li><a href='LED=18'>option 18</a></li>");
-  client.println("      <li><a href='LED=19'>Mark Kriegsman&lsquo;s TwinkleFOX</a></li>");
-  client.println("      <li><a href='LED=20'>Mark Kriegsman&lsquo;s TwinkleFOX Next Palette</a></li>");
+//  client.println("      <li><a href='LED=5'>Sparkle</a></li>");
+//  client.println("      <li><a href='LED=6'>option 06</a></li>");
+//  client.println("      <li><a href='LED=7'>option 07</a></li>");
+//  client.println("      <li><a href='LED=8'>option 08</a></li>");
+//  client.println("      <li><a href='LED=9'>All White (subtle twinkle)</a></li>");
+//  client.println("      <li><a href='LED=10'>option 10</a></li>");
+//  client.println("      <li><a href='LED=11'>option 11</a></li>");
+//  client.println("      <li><a href='LED=12'>option 12</a></li>");
+//  client.println("      <li><a href='LED=13'>option 13</a></li>");
+//  client.println("      <li><a href='LED=14'>option 14</a></li>");
+//  client.println("      <li><a href='LED=15'>option 15</a></li>");
+//  client.println("      <li><a href='LED=16'>option 16</a></li>");
+//  client.println("      <li><a href='LED=17'>Firelight</a></li>");
+//  client.println("      <li><a href='LED=18'>option 18</a></li>");
+  client.println("      <li><a href='LED=19'>Mark Kriegsman&lsquo;s TwinkleFOX (click again for new colours)</a></li>");
+//  client.println("      <li><a href='LED=20'>Mark Kriegsman&lsquo;s TwinkleFOX Next Palette</a></li>");
   client.println("      <li><a href='LED=999'>Turn &lsquo;em off</a></li>");
   client.println("    </ul>");
   client.println("  </body>");
@@ -447,11 +453,11 @@ void doLEDs(){
 //---------------------------------- Santa's Hat -------------------------------
       for (byte i = 0; i < iStripLength; i++) { //assumes iStripLength 100
         if (i < 40 || i > 90){
-//          leds[i] = CRGB::White;
-          leds[i] = CHSV(0, 0, 64);
+          leds[i] = CRGB::White;
+//          leds[i] = CHSV(0, 0, 64);
         }else{
-//          leds[i] = CRGB::Red;
-          leds[i] = CHSV(0, 255, 64);
+          leds[i] = CRGB::Red;
+//          leds[i] = CHSV(0, 255, 64);
         }
       }
       FastLED.show();
@@ -558,18 +564,12 @@ void doLEDs(){
     case 17:
 //---------------------------------- firelight ---------------------------------
 //      byte iWheelStart = 0;
-      for (byte i = 0; i < 100; i++) {
-        leds[random(0, iStripLength)] = CHSV(0 + random(0, 30), 255, 255);
+      EVERY_N_MILLISECONDS( 10 ) {
+        leds[random(0, iStripLength)] = CHSV(0 + random(10, 40), 255, 255);
         FastLED.show();
       }
 //---------------------------------- firelight ---------------------------------
       break;
-    case 19:
-//------------------------- Mark Kriegsman's TwinkleFOX next palette -----------
-      chooseNextColorPalette( gTargetPalette );
-      iMode = 18;
-//------------------------- Mark Kriegsman's TwinkleFOX next palette -----------
-//      break;
     case 18:
 //---------------------------------- Mark Kriegsman's TwinkleFOX ---------------
 //  EVERY_N_SECONDS( SECONDS_PER_PALETTE ) { 
@@ -584,6 +584,12 @@ void doLEDs(){
 
   FastLED.show();
 //---------------------------------- Mark Kriegsman's TwinkleFOX ---------------
+      break;
+    case 19:
+//------------------------- Mark Kriegsman's TwinkleFOX next palette -----------
+      chooseNextColorPalette( gTargetPalette );
+      iMode = 18;
+//------------------------- Mark Kriegsman's TwinkleFOX next palette -----------
       break;
     case 20:
       break;
@@ -1175,6 +1181,41 @@ const TProgmemRGBPalette16 Classic_p FL_PROGMEM =
   CRGB::Red, CRGB::Yellow, CRGB::Green, CRGB::Blue
 };
 
+const TProgmemRGBPalette16 Blorange_p FL_PROGMEM =
+{
+/*  0xFF1040
+
+255 FF
+238 EE
+221 DD
+204 CC
+187 BB
+170 AA
+153 99
+136 88
+128 80
+119 77
+111 6F
+102 66
+ 94 5E
+ 85 55
+ 77 4D
+ 68 44
+ 60 3C
+ 51 33
+ 43 2B
+ 34 22
+ 26 1A
+ 18 11
+  9 09
+  0 00
+*/  
+  0xFF8000, 0xEE7711, 0xDD6F22, 0xCC6633,
+  0xBB5E44, 0xAA5555, 0x994D66, 0x884477,
+  0x773C88, 0x663399, 0x552BAA, 0x4422BB,
+  0x331ACC, 0x2211DD, 0x1109EE, 0x0000FF
+};
+
 // Add or remove palette names from this list to control which color
 // palettes are used, and in what order.
 const TProgmemRGBPalette16* ActivePaletteList[] = {
@@ -1188,7 +1229,8 @@ const TProgmemRGBPalette16* ActivePaletteList[] = {
   &RedWhite_p,
   &Snow_p,
   &Holly_p,
-  &Ice_p
+  &Ice_p,
+  &Blorange_p
 };
 
 
