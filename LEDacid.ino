@@ -45,6 +45,43 @@ Proposed modes:
 const byte BRIGHTNESS = 64;
 //const byte BRIGHTNESS = 255;
 
+//---------------------------------- Mark Kriegsman's Fire2012 -----------------
+//#define FRAMES_PER_SECOND 60
+const byte FRAMES_PER_SECOND = 60;
+bool gReverseDirection = false;
+
+//CRGB leds[NUM_LEDS];
+
+// Fire2012 with programmable Color Palette
+//
+// This code is the same fire simulation as the original "Fire2012",
+// but each heat cell's temperature is translated to color through a FastLED
+// programmable color palette, instead of through the "HeatColor(...)" function.
+//
+// Four different static color palettes are provided here, plus one dynamic one.
+// 
+// The three static ones are: 
+//   1. the FastLED built-in HeatColors_p -- this is the default, and it looks
+//      pretty much exactly like the original Fire2012.
+//
+//  To use any of the other palettes below, just "uncomment" the corresponding code.
+//
+//   2. a gradient from black to red to yellow to white, which is
+//      visually similar to the HeatColors_p, and helps to illustrate
+//      what the 'heat colors' palette is actually doing,
+//   3. a similar gradient, but in blue colors rather than red ones,
+//      i.e. from black to blue to aqua to white, which results in
+//      an "icy blue" fire effect,
+//   4. a simplified three-step gradient, from black to red to white, just to show
+//      that these gradients need not have four components; two or
+//      three are possible, too, even if they don't look quite as nice for fire.
+//
+// The dynamic palette shows how you can change the basic 'hue' of the
+// color palette every time through the loop, producing "rainbow fire".
+
+CRGBPalette16 gPalFire;
+//---------------------------------- Mark Kriegsman's Fire2012 -----------------
+
 const byte iStripLength = 100; // max 254 unless vars changed from 'byte' - 255 used to set whole strip
 
 const char* tSSID = "SKYA7448";
@@ -66,7 +103,7 @@ boolean bLEDsOn=false;
 //#define COLOR_ORDER   RGB
 //#define DATA_PIN        5
 //#define CLK_PIN       4
-#define VOLTS          12
+#define VOLTS          5
 #define MAX_MA       4000
 
 //  TwinkleFOX: Twinkling 'holiday' lights that fade in and out.
@@ -165,6 +202,7 @@ CRGB gBackgroundColor = CRGB::Black;
 // incandescent bulbs change color as they dim down.
 #define COOL_LIKE_INCANDESCENT 0
 
+bool bFirstTimeRound = true;
 
 CRGBPalette16 gCurrentPalette;
 CRGBPalette16 gTargetPalette;
@@ -180,9 +218,13 @@ byte iHueMain = random(0, 256);
 byte iRG = 1;
 byte iYB = 1;
 
-uint32_t iColGold;
-
 //---------------------------------- lightning --------------------------------
+//  Original by: Daniel Wilson, 2014
+//
+//  Modified by: Andrew Tuline 2015
+//
+//  This modified version creates lightning along various sections of the strip. Looks great inside my poly fill constructed cloud.
+//
 uint8_t frequency = 50;                                       // controls the interval between strikes
 uint8_t flashes = 8;                                          //the upper limit of flashes per strike
 unsigned int dimmer = 1;
@@ -199,13 +241,29 @@ void setup() {
 // =============================================================================
   FastLED.delay(1000); // sanity check delay - allows reprogramming if accidently blowing power w/leds
 
+//---------------------------------- Mark Kriegsman's Fire2012 -----------------
+  // This first palette is the basic 'black body radiation' colors,
+  // which run from black to red to bright yellow to white.
+  // gPalFire = HeatColors_p;
+  
+  // These are other ways to set up the color palette for the 'fire'.
+  // First, a gradient from black to red to yellow to white -- similar to HeatColors_p
+  //   gPalFire = CRGBPalette16( CRGB::Black, CRGB::Red, CRGB::Yellow, CRGB::White);
+     gPalFire = CRGBPalette16( CRGB(2,0,0), CRGB(64,0,0), CRGB::Orange, CRGB::Gold);
+  
+  // Second, this palette is like the heat colors, but blue/aqua instead of red/yellow
+  //   gPalFire = CRGBPalette16( CRGB::Black, CRGB::Blue, CRGB::Aqua,  CRGB::White);
+  
+  // Third, here's a simpler, three-step gradient, from black to red to white
+  //   gPalFire = CRGBPalette16( CRGB::Black, CRGB::Red, CRGB::White);
+//---------------------------------- Mark Kriegsman's Fire2012 -----------------
 //---------------------------------- Mark Kriegsman's TwinkleFOX ---------------
   FastLED.setMaxPowerInVoltsAndMilliamps( VOLTS, MAX_MA);
 //  FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, NUM_LEDS)
   FastLED.addLeds<WS2812, DATA_PIN, RGB>(leds, iStripLength)
     .setCorrection(TypicalLEDStrip);
 
-  chooseNextColorPalette(gTargetPalette);
+  chooseNextColorPalette(gTargetPalette); //, 99);
 //---------------------------------- Mark Kriegsman's TwinkleFOX ---------------
 // Uncomment one of the following lines for your leds arrangement.
   // FastLED.addLeds<TM1803, DATA_PIN, RGB>(leds, iStripLength);
@@ -288,6 +346,7 @@ void loop() {
 //  bLEDsOn = true; // for testing without the webserver
   if (bLEDsOn){
     doLEDs();
+    bFirstTimeRound = false;
   }else{
     //EVERY_N_MILLISECONDS(33) {
     for(int i = 0; i < iStripLength/2; i++) {   
@@ -324,6 +383,7 @@ void doWeb() {
     if (request.indexOf("/LED=") != -1) {
       bLEDsOn=true;
       iMode = request.substring(request.indexOf("/LED=")+5, request.indexOf(" HTTP")).toInt();
+      bFirstTimeRound = true;
     }
   }
   // Display Web Page
@@ -394,9 +454,10 @@ void doWeb() {
 //  client.println("      <li><a href='LED=15'>option 15</a></li>");
 //  client.println("      <li><a href='LED=16'>option 16</a></li>");
 //  client.println("      <li><a href='LED=17'>Firelight</a></li>");
-//  client.println("      <li><a href='LED=18'>option 18</a></li>");
-  client.println("      <li><a href='LED=19'>Mark Kriegsman&lsquo;s TwinkleFOX (click again for new colours)</a></li>");
-//  client.println("      <li><a href='LED=20'>Mark Kriegsman&lsquo;s TwinkleFOX Next Palette</a></li>");
+  client.println("      <li><a href='LED=17'>Fire</a></li>");
+//  client.println("      <li><a href='LED=18'>Mark Kriegsman&lsquo;s TwinkleFOX</a></li>");
+  client.println("      <li><a href='LED=19'>TwinkleFOX (click again for new colours)</a></li>");
+  client.println("      <li><a href='LED=20'>TwinkleFOX fairy</a></li>");
   client.println("      <li><a href='LED=999'>Turn &lsquo;em off</a></li>");
   client.println("    </ul>");
   client.println("  </body>");
@@ -465,20 +526,24 @@ void doLEDs(){
       break;
     case 3:
 //---------------------------------- lightning ---------------------------------
-  ledstart = random8(iStripLength);           // Determine starting location of flash
-  ledlen = random8(iStripLength-ledstart);    // Determine length of flash (not to go beyond iStripLength-1)
-  for (int flashCounter = 0; flashCounter < random8(3,flashes); flashCounter++) {
-    if(flashCounter == 0) dimmer = 5;     // the brightness of the leader is scaled down by a factor of 5
-    else dimmer = random8(1,3);           // return strokes are brighter than the leader
-    fill_solid(leds+ledstart,ledlen,CHSV(255, 0, 255/dimmer));
-    FastLED.show();                       // Show a section of LED's
-    delay(random8(4,10));                 // each flash only lasts 4-10 milliseconds
-    fill_solid(leds+ledstart,ledlen,CHSV(255,0,0));   // Clear the section of LED's
-    FastLED.show();     
-    if (flashCounter == 0) delay (150);   // longer delay until next flash after the leader
-    delay(50+random8(100));               // shorter delay between strokes  
-  } // for()
-  delay(random8(frequency)*100);          // delay between strikes
+      if(bFirstTimeRound){
+        FastLED.clear();
+      }
+
+      ledstart = random8(iStripLength);           // Determine starting location of flash
+      ledlen = random8(iStripLength-ledstart);    // Determine length of flash (not to go beyond iStripLength-1)
+      for (int flashCounter = 0; flashCounter < random8(3,flashes); flashCounter++) {
+        if(flashCounter == 0) dimmer = 5;     // the brightness of the leader is scaled down by a factor of 5
+        else dimmer = random8(1,3);           // return strokes are brighter than the leader
+        fill_solid(leds+ledstart,ledlen,CHSV(255, 0, 255/dimmer));
+        FastLED.show();                       // Show a section of LED's
+        delay(random8(4,10));                 // each flash only lasts 4-10 milliseconds
+        fill_solid(leds+ledstart,ledlen,CHSV(255,0,0));   // Clear the section of LED's
+        FastLED.show();     
+        if (flashCounter == 0) delay (150);   // longer delay until next flash after the leader
+        delay(50+random8(100));               // shorter delay between strokes  
+      } // for()
+      delay(random8(frequency)*100);          // delay between strikes
 //---------------------------------- lightning ---------------------------------
       break;
     case 4:
@@ -561,7 +626,7 @@ void doLEDs(){
       //colorWipe(CRGB(255, 255, 255), 10); // White
       FastLED.show();
       break;
-    case 17:
+/*    case 17:
 //---------------------------------- firelight ---------------------------------
 //      byte iWheelStart = 0;
       EVERY_N_MILLISECONDS( 10 ) {
@@ -569,6 +634,29 @@ void doLEDs(){
         FastLED.show();
       }
 //---------------------------------- firelight ---------------------------------
+      break; */
+    case 17:
+//---------------------------------- Mark Kriegsman's Fire2012 -----------------
+      // Add entropy to random number generator; we use a lot of it.
+      // random16_add_entropy( random());
+    
+      // Fourth, the most sophisticated: this one sets up a new palette every
+      // time through the loop, based on a hue that changes every time.
+      // The palette is a gradient from black, to a dark color based on the hue,
+      // to a light color based on the hue, to white.
+    
+/*         static uint8_t hue = 0;
+         hue++;
+         CRGB darkcolor  = CHSV(hue,255,192); // pure hue, three-quarters brightness
+         CRGB lightcolor = CHSV(hue,128,255); // half 'whitened', full brightness
+         gPalFire = CRGBPalette16( CRGB::Black, darkcolor, lightcolor, CRGB::White);
+*/
+    
+      Fire2012WithPalette(); // run simulation frame, using palette colors
+      
+      FastLED.show(); // display this frame
+      FastLED.delay(1000 / FRAMES_PER_SECOND);
+//---------------------------------- Mark Kriegsman's Fire2012 -----------------
       break;
     case 18:
 //---------------------------------- Mark Kriegsman's TwinkleFOX ---------------
@@ -587,11 +675,15 @@ void doLEDs(){
       break;
     case 19:
 //------------------------- Mark Kriegsman's TwinkleFOX next palette -----------
-      chooseNextColorPalette( gTargetPalette );
+      chooseNextColorPalette(gTargetPalette); //, 99);
       iMode = 18;
 //------------------------- Mark Kriegsman's TwinkleFOX next palette -----------
       break;
     case 20:
+//------------------------- Mark Kriegsman's TwinkleFOX fairy palette ----------
+//      chooseNextColorPalette(gTargetPalette, 3);
+      iMode = 18;
+//------------------------- Mark Kriegsman's TwinkleFOX fairy palette ----------
       break;
     default:
       iMode = 0;
@@ -955,6 +1047,114 @@ byte blue(uint32_t c) {
 // =============================================================================
   return (c);
 }
+// Fire2012 by Mark Kriegsman, July 2012
+// as part of "Five Elements" shown here: http://youtu.be/knWiGsmgycY
+//// 
+// This basic one-dimensional 'fire' simulation works roughly as follows:
+// There's a underlying array of 'heat' cells, that model the temperature
+// at each point along the line.  Every cycle through the simulation, 
+// four steps are performed:
+//  1) All cells cool down a little bit, losing heat to the air
+//  2) The heat from each cell drifts 'up' and diffuses a little
+//  3) Sometimes randomly new 'sparks' of heat are added at the bottom
+//  4) The heat from each cell is rendered as a color into the leds array
+//     The heat-to-color mapping uses a black-body radiation approximation.
+//
+// Temperature is in arbitrary units from 0 (cold black) to 255 (white hot).
+//
+// This simulation scales it self a bit depending on NUM_LEDS; it should look
+// "OK" on anywhere from 20 to 100 LEDs without too much tweaking. 
+//
+// I recommend running this simulation at anywhere from 30-100 frames per second,
+// meaning an interframe delay of about 10-35 milliseconds.
+//
+// Looks best on a high-density LED setup (60+ pixels/meter).
+//
+//
+// There are two main parameters you can play with to control the look and
+// feel of your fire: COOLING (used in step 1 above), and SPARKING (used
+// in step 3 above).
+//
+// COOLING: How much does the air cool as it rises?
+// Less cooling = taller flames.  More cooling = shorter flames.
+// Default 50, suggested range 20-100 
+#define COOLING  55
+
+// SPARKING: What chance (out of 255) is there that a new spark will be lit?
+// Higher chance = more roaring fire.  Lower chance = more flickery fire.
+// Default 120, suggested range 50-200.
+#define SPARKING 120
+
+void Fire2012WithPalette()
+{
+// Array of temperature readings at each simulation cell
+  static byte heat[iStripLength];
+
+  // Step 1.  Cool down every cell a little
+    for( int i = 0; i < iStripLength; i++) {
+      heat[i] = qsub8( heat[i],  random8(0, ((COOLING * 10) / iStripLength) + 2));
+    }
+  
+    // Step 2.  Heat from each cell drifts 'up' and diffuses a little
+    for( int k= iStripLength - 1; k >= 2; k--) {
+      heat[k] = (heat[k - 1] + heat[k - 2] + heat[k - 2] ) / 3;
+    }
+    
+    // Step 3.  Randomly ignite new 'sparks' of heat near the bottom
+    if( random8() < SPARKING ) {
+      int y = random8(7);
+      heat[y] = qadd8( heat[y], random8(160,255) );
+    }
+
+    // Step 4.  Map from heat cells to LED colors
+    for( int j = 0; j < iStripLength; j++) {
+      // Scale the heat value from 0-255 down to 0-240
+      // for best results with color palettes.
+      byte colorindex = scale8( heat[j], 240);
+      CRGB color = ColorFromPalette( gPalFire, colorindex);
+      int pixelnumber;
+      if( gReverseDirection ) {
+        pixelnumber = (iStripLength-1) - j;
+      } else {
+        pixelnumber = j;
+      }
+      leds[pixelnumber] = color;
+    }
+}
+/* void Fire2012()
+{
+// Array of temperature readings at each simulation cell
+  static byte heat[iStripLength];
+
+  // Step 1.  Cool down every cell a little
+    for( int i = 0; i < iStripLength; i++) {
+      heat[i] = qsub8( heat[i],  random8(0, ((COOLING * 10) / iStripLength) + 2));
+    }
+  
+    // Step 2.  Heat from each cell drifts 'up' and diffuses a little
+    for( int k= iStripLength - 1; k >= 2; k--) {
+      heat[k] = (heat[k - 1] + heat[k - 2] + heat[k - 2] ) / 3;
+    }
+    
+    // Step 3.  Randomly ignite new 'sparks' of heat near the bottom
+    if( random8() < SPARKING ) {
+      int y = random8(7);
+      heat[y] = qadd8( heat[y], random8(160,255) );
+    }
+
+    // Step 4.  Map from heat cells to LED colors
+    for( int j = 0; j < iStripLength; j++) {
+      CRGB color = HeatColor( heat[j]);
+      int pixelnumber;
+      if( gReverseDirection ) {
+        pixelnumber = (iStripLength-1) - j;
+      } else {
+        pixelnumber = j;
+      }
+      leds[pixelnumber] = color;
+    }
+} */
+
 //------------------ All the rest is Mark Kriegsman's TwinkleFOX ---------------
 //  This function loops over each pixel, calculates the 
 //  adjusted 'clock' that this pixel should use, and calls 
@@ -1235,12 +1435,16 @@ const TProgmemRGBPalette16* ActivePaletteList[] = {
 
 
 // Advance to the next color palette in the list (above).
-void chooseNextColorPalette( CRGBPalette16& pal)
+void chooseNextColorPalette( CRGBPalette16& pal) //, byte iPal)
 {
-  const uint8_t numberOfPalettes = sizeof(ActivePaletteList) / sizeof(ActivePaletteList[0]);
-  static uint8_t whichPalette = -1; 
-  whichPalette = addmod8( whichPalette, 1, numberOfPalettes);
-
-  pal = *(ActivePaletteList[whichPalette]);
+//  if (iPal ==999){
+    const uint8_t numberOfPalettes = sizeof(ActivePaletteList) / sizeof(ActivePaletteList[0]);
+    static uint8_t whichPalette = -1; 
+    whichPalette = addmod8( whichPalette, 1, numberOfPalettes);
+  
+    pal = *(ActivePaletteList[whichPalette]);
+//  } else{
+//    pal = *(ActivePaletteList[iPal]);
+//  }
 }
 
