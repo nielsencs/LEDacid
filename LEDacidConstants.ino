@@ -15,8 +15,10 @@ const byte O_CascadeRainbow = 243;
 //Specials
 const byte O_SantaHat = 2;
 const byte O_Lightning = 3;
+const byte O_PsychOut = 4;
 const byte O_Police = 6;
 const byte O_Classic = 12;
+
 const byte O_TopStar = 246;
 const byte O_PausePlay = 254;
 const byte O_FadeOut = 255;

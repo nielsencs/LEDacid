@@ -388,7 +388,7 @@ const TProgmemRGBPalette16* ActivePaletteList[] = {
   &gPalWater,
   &Blorange_p,
   &RuGBY_p,
-//&WhitePurple_p,
+  &WhitePurple_p,
   &RedGreenWhite_p,
   &Holly_p,
   &Aquorange_p,
@@ -398,8 +398,8 @@ const TProgmemRGBPalette16* ActivePaletteList[] = {
   &Ruthies_p,
   &AquaGray_p,
   &Monochrome_p,
-  &SantaHat_p,
   &Snow_p,
+  &SantaHat_p,
   &Ice_p  
 };
 

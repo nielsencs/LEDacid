@@ -254,6 +254,20 @@ const TProgmemRGBPalette16 Pastel_p =
   0x101040, 0x401040, 0x404040, 0x404010,
   0x100808, 0x081008, 0x081010, 0x000000
 };
-//const CRGBPalette16 Black_p = CRGBPalette16(CRGB::Black);
-const CRGBPalette16 WhitePurple_p = CRGBPalette16(CRGB::White, CRGB::Purple, CRGB::Indigo);
+//const CRGBPalette16 Black_p = CRGBPalette16(CRGB::Black); //SCOPE!!
+//const CRGBPalette16 WhitePurple_p = CRGBPalette16(CRGB::White, CRGB::Purple, CRGB::Indigo);
+const TProgmemRGBPalette16 WhitePurple_p =
+{
+  0xFFFFFF, 0xFFEEFF, 0xFFDDFF, 0xFFCCFF,
+  0xFFAAFF, 0xFF99FF, 0xFF88FF, 0xFF77FF,
+  0x773377, 0x673367, 0x563356, 0x463346,
+  0x330033, 0x230023, 0x130013, 0x030003
+};
+//const TProgmemRGBPalette16 Black_p =
+//{
+//  0x000000, 0x000000, 0x000000, 0x000000,
+//  0x000000, 0x000000, 0x000000, 0x000000,
+//  0x000000, 0x000000, 0x000000, 0x000000,
+//  0x000000, 0x000000, 0x000000, 0x000000
+//};
 

@@ -118,21 +118,33 @@ void doLEDs(){
   setTopStar();
 
   switch (iMode){
-//    case O_TopStar:
-//      iTopStar=1-iTopStar;
-//      iMode = iModePrevious;
-//      break;
+// ------------------------------------------ Patterns ------------------------------------------
     case O_Still:
       EVERY_N_MILLISECONDS(10) {
         for (byte c = 0; c< (iStripLength-iTopStar); c++) {
           byte fPaletteSlot = int(iPaletteEnd-c*(float(iPaletteEnd)/float(iStripLength-iTopStar)));
-//          Serial.print(c);
-//          Serial.print(" <-c fPaletteSlot-> ");
-//          Serial.println(fPaletteSlot);
+          if(bFirstTimeRound){
+            Serial.print(c);
+            Serial.print(" <-c fPaletteSlot-> ");
+            Serial.println(fPaletteSlot);
+          }
           ledsA[c] = ColorFromPalette(gCurrentPalette, fPaletteSlot); //, 128, NOBLEND);
           ledsB[c] = ColorFromPalette(gCurrentPalette, fPaletteSlot); //, 128, NOBLEND);
         }
         FastLED.show();
+      }
+      break;
+    case O_FadePalette:
+      EVERY_N_MILLISECONDS(70) {
+        byte iHue;
+        for(byte i = 0; i < (iStripLength-iTopStar); i++){
+          iHue = iHueMain;
+//          iHue = iHueMain + i;
+          ledsA[i] = ColorFromPalette(gCurrentPalette, iHue);
+          ledsB[i] = ColorFromPalette(gCurrentPalette, iHue);
+        }
+        FastLED.show();
+        iHueMain++; // since this is a 'byte' will keep cycling from 0 to 255
       }
       break;
     case O_SlowCycle:
@@ -148,18 +160,17 @@ void doLEDs(){
         iHueMain++; // since this is a 'byte' will keep cycling from 0 to 255
       }
       break;
-    case O_FadePalette:
-      EVERY_N_MILLISECONDS(70) {
-        byte iHue;
-        for(byte i = 0; i < (iStripLength-iTopStar); i++){
-          iHue = iHueMain;
-//          iHue = iHueMain + i;
-          ledsA[i] = ColorFromPalette(gCurrentPalette, iHue);
-          ledsB[i] = ColorFromPalette(gCurrentPalette, iHue);
-        }
-        FastLED.show();
-        iHueMain++; // since this is a 'byte' will keep cycling from 0 to 255
-      }
+    case O_TwinkleFOX:
+      drawTwinkles(ledsA);
+      drawTwinkles(ledsB);
+      setTopStar();
+      FastLED.show();
+      break;
+    case O_SparkleHard:
+      Sparkle(true);
+      break;
+    case O_SparkleSoft:
+      Sparkle(false);
       break;
     case O_Cascade:
       EVERY_N_MILLISECONDS(42) {
@@ -195,11 +206,42 @@ void doLEDs(){
         ledsB((iStripLength-iTopStar-1)/2,(iStripLength-iTopStar)-1) = ledsB((iStripLength-iTopStar-1)/2 - 1 ,0);
       }
       break;
-    case O_SparkleHard:
-      Sparkle(true);
+    case O_FireWater:
+// ---------------------------------- Mark Kriegsman's Fire2012 ----------------------------------
+      // Add entropy to random number generator; we use a lot of it.
+//       random16_add_entropy( random());
+    
+      // Fourth, the most sophisticated: this one sets up a new palette every
+      // time through the loop, based on a hue that changes every time.
+      // The palette is a gradient from black, to a dark color based on the hue,
+      // to a light color based on the hue, to white.
+    
+/*         static uint8_t hue = 0;
+         hue++;
+         CRGB darkcolor  = CHSV(hue,255,192); // pure hue, three-quarters brightness
+         CRGB lightcolor = CHSV(hue,128,255); // half 'whitened', full brightness
+         gPalFire = CRGBPalette16( CRGB::Black, darkcolor, lightcolor, CRGB::White);
+*/
+    
+      Fire2012WithPalette(); // run simulation frame, using palette colors
+
+      FastLED.show(); // display this frame
+      FastLED.delay(1000 / FRAMES_PER_SECOND);
+// --------------------------------- Mark Kriegsman's Fire2012 ----------------------------------
       break;
-    case O_SparkleSoft:
-      Sparkle(false);
+// ------------------------------------------ Patterns ------------------------------------------
+// ------------------------------------------ Specials ------------------------------------------
+    case O_Fire:
+      gTargetPalette = gPalFire;
+      gCurrentPalette = gPalFire;
+      gReverseDirection = false;
+      iMode = O_FireWater;
+      break;
+    case O_Water:
+      gTargetPalette = gPalWater;
+      gCurrentPalette = gPalWater;
+      gReverseDirection = true;
+      iMode = O_FireWater;
       break;
     case O_Lightning:
       if(bFirstTimeRound){
@@ -248,6 +290,14 @@ void doLEDs(){
         }
       }
       break;
+    case O_Classic:
+      classicCycle();
+      break;
+    case O_SantaHat:
+      gTargetPalette = SantaHat_p;
+      gCurrentPalette = SantaHat_p;
+      iMode = O_Still;
+      break;
     case O_Police:
       EVERY_N_MILLISECONDS(37) {
         for(byte i = (iStripLength-iTopStar-1)/3; i < ((iStripLength-iTopStar-1)/3)*2; i++) {
@@ -268,105 +318,79 @@ void doLEDs(){
         FastLED.show();
       }
       break;
-    case O_Classic:
-      classicCycle();
-      break;
-    case O_FireWater:
-// ---------------------------------- Mark Kriegsman's Fire2012 ----------------------------------
-      Fire2012WithPalette(); // run simulation frame, using palette colors
-
-      FastLED.show(); // display this frame
-      FastLED.delay(1000 / FRAMES_PER_SECOND);
-// ---------------------------------- Mark Kriegsman's Fire2012 ----------------------------------
-      break;
-    case O_Water:
-      gTargetPalette = gPalWater;
-      gCurrentPalette = gPalWater;
-      gReverseDirection = true;
+    case O_PsychOut:
+      gTargetPalette = RuGBY_p;
+      gCurrentPalette = RuGBY_p;
       iMode = O_FireWater;
+      bCyclePalettes=false;
       break;
-    case O_Fire:
-      gTargetPalette = gPalFire;
-      gCurrentPalette = gPalFire;
-      gReverseDirection = false;
-      // Add entropy to random number generator; we use a lot of it.
-      // random16_add_entropy( random());
-    
-      // Fourth, the most sophisticated: this one sets up a new palette every
-      // time through the loop, based on a hue that changes every time.
-      // The palette is a gradient from black, to a dark color based on the hue,
-      // to a light color based on the hue, to white.
-    
-/*         static uint8_t hue = 0;
-         hue++;
-         CRGB darkcolor  = CHSV(hue,255,192); // pure hue, three-quarters brightness
-         CRGB lightcolor = CHSV(hue,128,255); // half 'whitened', full brightness
-         gPalFire = CRGBPalette16( CRGB::Black, darkcolor, lightcolor, CRGB::White);
-*/
-    
-      iMode = O_FireWater;
-      break;
-    case O_TwinkleFOX:
-      drawTwinkles(ledsA);
-      drawTwinkles(ledsB);
-      setTopStar();
-      FastLED.show();
-      break;
+// ------------------------------------------ Specials ------------------------------------------
+// --------------------------------------- Old Favourites ---------------------------------------
     case O_TwinkleFOXClassic:
       gTargetPalette = FairyLight_p;
-//      gCurrentPalette = FairyLight_p;
+      gCurrentPalette = FairyLight_p;
       iMode = O_TwinkleFOX;
+      bCyclePalettes=false;
       break;
     case O_SlowCycleRainbow:
       gTargetPalette = RainbowColors_p;
-//      gCurrentPalette = RainbowColors_p;
+      gCurrentPalette = RainbowColors_p;
       iMode = O_SlowCycle;
+      bCyclePalettes=false;
       break;
     case O_SlowCycleRainbowStripe:
       gTargetPalette = RainbowStripeColors_p;
-//      gCurrentPalette = RainbowStripeColors_p;
+      gCurrentPalette = RainbowStripeColors_p;
       iMode = O_SlowCycle;
+      bCyclePalettes=false;
       break;
     case O_CascadeRainbow:
       gTargetPalette = RainbowColors_p;
-//      gCurrentPalette = RainbowColors_p;
+      gCurrentPalette = RainbowColors_p;
       iMode = O_Cascade;
+      bCyclePalettes=false;
       break;
     case O_SparkleStar:
+      if(bFirstTimeRound){
+        FastLED.clear();
+      }
       gTargetPalette = Stars_p;
-//      gCurrentPalette = Stars_p;
+      gCurrentPalette = Stars_p;
       iMode = O_SparkleSoft;
+      bCyclePalettes=false;
       break;
     case O_SparkleWhiteGold:
+      if(bFirstTimeRound){
+        FastLED.clear();
+      }
       gTargetPalette = WhiteGold_p;
-//      gCurrentPalette = WhiteGold_p;
+      gCurrentPalette = WhiteGold_p;
       iMode = O_SparkleHard;
+      bCyclePalettes=false;
       break;
     case O_TwinkleFOXHolly:
       gTargetPalette = Holly_p;
-//      gCurrentPalette = Holly_p;
+      gCurrentPalette = Holly_p;
       iMode = O_TwinkleFOX;
+      bCyclePalettes=false;
       break;
     case O_Snowing:
       gTargetPalette = Monochrome_p;
-//      gCurrentPalette = Monochrome_p;
+      gCurrentPalette = Monochrome_p;
       iMode = O_SlowCycle;
-      break;
-    case O_SantaHat:
-      gTargetPalette = SantaHat_p;
-      gCurrentPalette = SantaHat_p;
-      iMode = O_Still;
+      bCyclePalettes=false;
       break;
     case O_SparkleBlorange:
+      if(bFirstTimeRound){
+        FastLED.clear();
+      }
       gTargetPalette = Blorange_p;
-//      gCurrentPalette = Blorange_p;
+      gCurrentPalette = Blorange_p;
       iMode = O_SparkleSoft;
+      bCyclePalettes=false;
       break;
-//------------------------- Palettes -------------------------------------------
-//    case O_CyclePalettes:
-//      bCyclePalettes=!bCyclePalettes;
-//      iMode = iModePrevious;
-//      break;
+// --------------------------------------- Old Favourites ---------------------------------------
+// ------------------------------------------ Palettes ------------------------------------------
     case O_FairyLight_p:
       gTargetPalette = FairyLight_p;
       iMode = iModePrevious;
@@ -483,12 +507,13 @@ void doLEDs(){
       gTargetPalette = Black_p;
       iMode = iModePrevious;
       break;
-//---------------------------------- All One Colour ----------------------------
+// ------------------------------------------ Palettes ------------------------------------------
+// --------------------------------------- All One Colour ---------------------------------------
     case O_OneColour:
       gTargetPalette = CRGBPalette16(CHSV(iOneColHue, 255, 255));
       iMode = iModePrevious;
       break;
-//---------------------------------- All One Colour ----------------------------
+// --------------------------------------- All One Colour ---------------------------------------
     default:
       iMode = 0;
       break;
