@@ -11,12 +11,8 @@
 To use- set the relevant connections below, then upload the sketch and get the IP address (e.g. 192.168.0.42)
 from the serial monitor; browse via same wifi router and away we go!
 */
-//const char* tSSID = "MiSMK";
-//const char* tPass = "3M3n1nSh3ds12";
-const char* tSSID = "SKYBM7WI";
-const char* tPass = "au2YtTkpSmhv";
 // -------- for hotspot ----------------------------------------------------------
-//const char* tSSID = "LEDacid";
+const char* tSSID = "LEDacid";
 //const char* tPass = "thereisnospoon";
 // -------- for hotspot ----------------------------------------------------------
 /*
@@ -134,10 +130,12 @@ typedef void (*SimplePatternList[])();
 uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
 uint8_t gHue = 0; // rotating "base color" used by many of the patterns
 
-byte iLEDstatus=0; // 0 - off, 1 - on, 2 - paused
+byte iTopStar=0;
+
+byte iLEDstatus=1; // 0 - off, 1 - on, 2 - paused
 byte iFlipBlue=0;
 byte iFlipRed=0;
-byte iOneColHue=167;
+byte iOneColHue=88;
 
 bool bFirstTimeRound = true;
 byte iUp = 1;
@@ -186,8 +184,8 @@ void nextPattern(){
 //======================================================================================
 void rainbow(){
 //======================================================================================
-//  fill_rainbow( leds[0], iStripLength, gHue, 7);
-//  fill_rainbow( leds[1], iStripLength, gHue, 7);
+//  fill_rainbow( leds[0], (iStripLength-iTopStar), gHue, 7);
+//  fill_rainbow( leds[1], (iStripLength-iTopStar), gHue, 7);
 }
 //======================================================================================
 void rainbowWithGlitter(){
@@ -200,23 +198,23 @@ void rainbowWithGlitter(){
 void addGlitter( fract8 chanceOfGlitter){
 //======================================================================================
   if( random8() < chanceOfGlitter) {
-//    leds[0][ random16(iStripLength) ] += CRGB::White;
+//    leds[0][ random16((iStripLength-iTopStar)) ] += CRGB::White;
   }
 }
 //======================================================================================
 void confetti(){
 //======================================================================================
   // random colored speckles that blink in and fade smoothly
-//  fadeToBlackBy( leds[0], iStripLength, 10);
-  int pos = random16(iStripLength);
+//  fadeToBlackBy( leds[0], (iStripLength-iTopStar), 10);
+  int pos = random16((iStripLength-iTopStar));
 //  leds[0][pos] += CHSV( gHue + random8(64), 200, 255);
 }
 //======================================================================================
 void sinelon(byte iStrip){
 //======================================================================================
   // a colored dot sweeping back and forth, with fading trails
-//  fadeToBlackBy( leds[iStrip], iStripLength, 20);
-  int pos = beatsin16( 13, 0, iStripLength-1 );
+//  fadeToBlackBy( leds[iStrip], (iStripLength-iTopStar), 20);
+  int pos = beatsin16( 13, 0, (iStripLength-iTopStar)-1 );
 //  leds[iStrip][pos] += CHSV( gHue, 255, 192);
 }
 //======================================================================================
@@ -226,7 +224,7 @@ void bpm(){
   uint8_t BeatsPerMinute = 62;
   CRGBPalette16 palette = PartyColors_p;
   uint8_t beat = beatsin8( BeatsPerMinute, 64, 255);
-  for( int i = 0; i < iStripLength; i++) { //9948
+  for( int i = 0; i < (iStripLength-iTopStar); i++) { //9948
 //    leds[0][i] = ColorFromPalette(palette, gHue+(i*2), beat-gHue+(i*10));
     ledsA[i] = ColorFromPalette(palette, gHue+(i*2), beat-gHue+(i*10));
   }
@@ -235,11 +233,11 @@ void bpm(){
 void juggle(){
 //======================================================================================
   // eight colored dots, weaving in and out of sync with each other
-//  fadeToBlackBy( leds[0], iStripLength, 20);
-  fadeToBlackBy( ledsA, iStripLength, 20);
+//  fadeToBlackBy( leds[0], (iStripLength-iTopStar), 20);
+  fadeToBlackBy( ledsA, (iStripLength-iTopStar), 20);
   byte dothue = 0;
   for( int i = 0; i < 8; i++) {
-//    leds[0][beatsin16( i+7, 0, iStripLength-1 )] |= CHSV(dothue, 200, 255);
+//    leds[0][beatsin16( i+7, 0, (iStripLength-iTopStar)-1 )] |= CHSV(dothue, 200, 255);
     dothue += 32;
   }
 }
