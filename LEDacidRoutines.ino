@@ -18,8 +18,8 @@ void Sparkle(boolean bHard){
 //      gCurrentPalette = gTargetPalette;
 
   if (bHard){
-    ledsA.fadeToBlackBy(10);
-    ledsB.fadeToBlackBy(10);
+//    ledsA.fadeToBlackBy(10);
+//    ledsB.fadeToBlackBy(10);
   }else{
     ledsA.fadeLightBy(10);
     ledsB.fadeLightBy(10);
@@ -136,12 +136,9 @@ void doLEDs(){
       break;
     case O_FadePalette:
       EVERY_N_MILLISECONDS(70) {
-        byte iHue;
         for(byte i = 0; i < (iStripLength-iTopStar); i++){
-          iHue = iHueMain;
-//          iHue = iHueMain + i;
-          ledsA[i] = ColorFromPalette(gCurrentPalette, iHue);
-          ledsB[i] = ColorFromPalette(gCurrentPalette, iHue);
+          ledsA[i] = ColorFromPalette(gCurrentPalette, iHueMain);
+          ledsB[i] = ColorFromPalette(gCurrentPalette, iHueMain);
         }
         FastLED.show();
         iHueMain++; // since this is a 'byte' will keep cycling from 0 to 255
@@ -149,28 +146,13 @@ void doLEDs(){
       break;
     case O_SlowCycle:
       EVERY_N_MILLISECONDS(70) {
-        byte iHue;
         for(byte i = 0; i < (iStripLength-iTopStar); i++){
-          //iHue = iHueMain;
-          iHue = iHueMain + i;
-          ledsA[i] = ColorFromPalette(gCurrentPalette, iHue);
-          ledsB[i] = ColorFromPalette(gCurrentPalette, iHue);
+          ledsA[i] = ColorFromPalette(gCurrentPalette, iHueMain - i);
+          ledsB[i] = ColorFromPalette(gCurrentPalette, iHueMain - i);
         }
         FastLED.show();
-        iHueMain++; // since this is a 'byte' will keep cycling from 0 to 255
+        iHueMain--; // since this is a 'byte' will keep cycling from 0 to 255
       }
-      break;
-    case O_TwinkleFOX:
-      drawTwinkles(ledsA);
-      drawTwinkles(ledsB);
-      setTopStar();
-      FastLED.show();
-      break;
-    case O_SparkleHard:
-      Sparkle(true);
-      break;
-    case O_SparkleSoft:
-      Sparkle(false);
       break;
     case O_Cascade:
       EVERY_N_MILLISECONDS(42) {
@@ -179,11 +161,9 @@ void doLEDs(){
         if (iLED == 0){
           iLED = (iStripLength-iTopStar-1);
         }
-        ledsA.fadeToBlackBy(8);
-//        ledsA[iLED] = ColorFromPalette(gTargetPalette, hue++);
+        ledsA.fadeToBlackBy(7);
         ledsA[iLED] = ColorFromPalette(gCurrentPalette, hue++);
-        ledsB.fadeToBlackBy(8);
-//        ledsB[iLED] = ColorFromPalette(gTargetPalette, hue++);
+        ledsB.fadeToBlackBy(7);
         ledsB[iLED] = ColorFromPalette(gCurrentPalette, hue++);
         iLED--;
       }
@@ -205,6 +185,18 @@ void doLEDs(){
         ledsA((iStripLength-iTopStar-1)/2,(iStripLength-iTopStar)-1) = ledsA((iStripLength-iTopStar-1)/2 - 1 ,0);
         ledsB((iStripLength-iTopStar-1)/2,(iStripLength-iTopStar)-1) = ledsB((iStripLength-iTopStar-1)/2 - 1 ,0);
       }
+      break;
+    case O_SparkleHard:
+      Sparkle(true);
+      break;
+    case O_SparkleSoft:
+      Sparkle(false);
+      break;
+    case O_TwinkleFOX:
+      drawTwinkles(ledsA);
+      drawTwinkles(ledsB);
+      setTopStar();
+      FastLED.show();
       break;
     case O_FireWater:
 // ---------------------------------- Mark Kriegsman's Fire2012 ----------------------------------
@@ -445,6 +437,10 @@ void doLEDs(){
       break;
     case O_RuGBY_p:
       gTargetPalette = RuGBY_p;
+      iMode = iModePrevious;
+      break;
+    case O_RGB_p:
+      gTargetPalette = RGB_p;
       iMode = iModePrevious;
       break;
     case O_Holly_p:
