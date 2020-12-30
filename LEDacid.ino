@@ -11,6 +11,8 @@
 To use- set the relevant connections below, then upload the sketch and get the IP address (e.g. 192.168.0.42)
 from the serial monitor; browse via same wifi router and away we go!
 */
+//const char* tSSID = "YourRouter";
+//const char* tPass = "RouterPassword";
 // -------- for hotspot ----------------------------------------------------------
 const char* tSSID = "LEDacid";
 //const char* tPass = "thereisnospoon";
@@ -81,7 +83,7 @@ byte iHueMain = random8();
 byte iRG = 1;
 byte iYB = 1;
 
-const CRGBPalette16 Black_p = CRGBPalette16(CRGB::Black);
+const CRGBPalette16 Black_p = CRGBPalette16(CRGB::Black); //SCOPE!!
 
 //======================================================================================
 void setup() {
