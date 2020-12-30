@@ -72,22 +72,6 @@ const TProgmemRGBPalette16 gPalWater =
   CRGB::White,  CRGB::White,  CRGB::Aqua, CRGB::White
 };
 
-const TProgmemRGBPalette16 SantaHat_p = 
-{
-  CRGB::White,  CRGB::White,  CRGB::Red,   CRGB::Red, 
-  CRGB::Red,    CRGB::Red,    CRGB::Red,   CRGB::Red,
-  CRGB::Red,    CRGB::Red,    CRGB::Red,   CRGB::Red,  
-  CRGB::White,  CRGB::White,  CRGB::White, CRGB::White
-};
-
-const TProgmemRGBPalette16 Monochrome_p =
-{
-  CRGB::White,  CRGB::Black,  CRGB::White, CRGB::Black,
-  CRGB::White,  CRGB::Black,  CRGB::White, CRGB::Black,
-  CRGB::White,  CRGB::Black,  CRGB::White, CRGB::Black,
-  CRGB::White,  CRGB::Black,  CRGB::White, CRGB::Black
-};
-
 // A mostly red palette with green accents and white trim.
 // "CRGB::Gray" is used as white to keep the brightness more uniform.
 const TProgmemRGBPalette16 RedGreenWhite_p FL_PROGMEM =
@@ -188,18 +172,19 @@ const TProgmemRGBPalette16 Aquorange_p =
 };
 
 const TProgmemRGBPalette16 Grurple_p =
-{  CRGB::Green,        CRGB::Green,       CRGB::Green,        CRGB::Purple,
-   CRGB::DarkGreen,    CRGB::DarkGreen,   CRGB::Indigo,       CRGB::Green,
-   CRGB::Blue,         CRGB::Magenta,     CRGB::Aqua,         CRGB::Orchid,
-   CRGB::MidnightBlue, CRGB::DarkGreen,   CRGB::Purple,       CRGB::Plum
+{
+  0x00FF00, 0x00FF11, 0x00FF22, 0x00FF33,
+  0x00CC44, 0x009955, 0x006666, 0x003377,
+  0x000088, 0x330099, 0x330066, 0x330033,
+  0x220022, 0x110011, 0x070007, 0x030003 
 };
 
 const TProgmemRGBPalette16 Dawn_p = 
 {
-  0x1166FF, 0x2266EE, 0x3366DD, 0x4466CC,
-  0x557799, 0x668899, 0x889999, 0xAA8899,
-  0xAA8888, 0xEEEE99, 0xDDDD99, 0xCCCC99,
-  0xBB9999, 0xAA6633, 0x995010, 0x994000
+  0x0033FF, 0x0066FF, 0x0099FF, 0x00AAFF,
+  0x00FFFF, 0x33FFAA, 0x66FF99, 0x99FF66,
+  0xAAFF33, 0xFFFF33, 0xFFAA33, 0xFF9933,
+  0xAA6600, 0x993300, 0x660000, 0x990000
 };
 
 const TProgmemRGBPalette16 Ruthies_p =
@@ -239,6 +224,15 @@ const TProgmemRGBPalette16 RuGBY_p =
   CRGB::Red, CRGB::Gold, CRGB::Green, CRGB::Blue
 };
 
+
+const TProgmemRGBPalette16 RGB_p =
+{
+  CRGB::White,  CRGB::Red,   CRGB::Green, CRGB::Blue,
+  CRGB::Red,    CRGB::Green, CRGB::Blue,  CRGB::Red,
+  CRGB::Green,  CRGB::Blue,  CRGB::Red,   CRGB::Green,
+  CRGB::Blue,   CRGB::Red,   CRGB::Green, CRGB::Blue
+};
+
 const TProgmemRGBPalette16 Stars_p =
 {
   0xFFFFFF, 0x100010, 0x100010, 0x100010,
@@ -254,7 +248,7 @@ const TProgmemRGBPalette16 Pastel_p =
   0x101040, 0x401040, 0x404040, 0x404010,
   0x100808, 0x081008, 0x081010, 0x000000
 };
-//const CRGBPalette16 Black_p = CRGBPalette16(CRGB::Black); //SCOPE!!
+
 //const CRGBPalette16 WhitePurple_p = CRGBPalette16(CRGB::White, CRGB::Purple, CRGB::Indigo);
 const TProgmemRGBPalette16 WhitePurple_p =
 {
@@ -263,6 +257,24 @@ const TProgmemRGBPalette16 WhitePurple_p =
   0x773377, 0x673367, 0x563356, 0x463346,
   0x330033, 0x230023, 0x130013, 0x030003
 };
+
+const TProgmemRGBPalette16 SantaHat_p = 
+{
+  CRGB::White,  CRGB::White,  CRGB::Red,   CRGB::Red, 
+  CRGB::Red,    CRGB::Red,    CRGB::Red,   CRGB::Red,
+  CRGB::Red,    CRGB::Red,    CRGB::Red,   CRGB::Red,  
+  CRGB::White,  CRGB::White,  CRGB::White, CRGB::White
+};
+
+const TProgmemRGBPalette16 Monochrome_p =
+{
+  CRGB::White,  CRGB::Black,  CRGB::White, CRGB::Black,
+  CRGB::White,  CRGB::Black,  CRGB::White, CRGB::Black,
+  CRGB::White,  CRGB::Black,  CRGB::White, CRGB::Black,
+  CRGB::White,  CRGB::Black,  CRGB::White, CRGB::Black
+};
+
+//const CRGBPalette16 Black_p = CRGBPalette16(CRGB::Black); //SCOPE!!
 //const TProgmemRGBPalette16 Black_p =
 //{
 //  0x000000, 0x000000, 0x000000, 0x000000,
@@ -270,4 +282,12 @@ const TProgmemRGBPalette16 WhitePurple_p =
 //  0x000000, 0x000000, 0x000000, 0x000000,
 //  0x000000, 0x000000, 0x000000, 0x000000
 //};
+
+const TProgmemRGBPalette16 White_p =
+{
+  0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF,
+  0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF,
+  0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF,
+  0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF
+};
 
