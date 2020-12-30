@@ -35,7 +35,7 @@ Proposed modes:
 
 #define VOLTS              5
 #define MAX_MA             12000
-#define BRIGHTNESS         128 //255
+#define BRIGHTNESS         255
 //#define FRAMES_PER_SECOND  60
 const byte FRAMES_PER_SECOND = 60;
 #define NUM_STRIPS         2
@@ -63,7 +63,7 @@ typedef void (*SimplePatternList[])();
 //SimplePatternList gPatterns = { rainbow, rainbowWithGlitter, confetti, sinelon, juggle, bpm };
 
 uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
-uint8_t gHue = 0; // rotating "base color" used by many of the patterns
+uint8_t giMainHue = 0; // rotating "base color" used by many of the patterns
 boolean bCyclePalettes = false;
 
 byte iTopStar=0;
@@ -170,7 +170,7 @@ void loop()
 //  iLEDstatus = 1; // 1=LEDs on 0=LEDs off (1 for testing without the webserver)
   doWeb();
 //  Serial.println(iLEDstatus);
-  if (iLEDstatus >= 1){
+  if (iLEDstatus >= 1){ //
     if (iLEDstatus == 1){
       if (bCyclePalettes){
         EVERY_N_SECONDS( SECONDS_PER_PALETTE ) { 
@@ -197,7 +197,7 @@ void loop()
 //  FastLED.delay(1000/FRAMES_PER_SECOND); 
 
   // do some periodic updates
-  EVERY_N_MILLISECONDS( 20 ) { gHue++; } // slowly cycle the "base color" through the rainbow
+  EVERY_N_MILLISECONDS( 20 ) { giMainHue++; } // slowly cycle the "base color" through the rainbow
 }
 
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
@@ -211,8 +211,8 @@ void nextPattern(){
 //======================================================================================
 void rainbow(){
 //======================================================================================
-//  fill_rainbow( leds[0], (iStripLength-iTopStar), gHue, 7);
-//  fill_rainbow( leds[1], (iStripLength-iTopStar), gHue, 7);
+//  fill_rainbow( leds[0], (iStripLength-iTopStar), giMainHue, 7);
+//  fill_rainbow( leds[1], (iStripLength-iTopStar), giMainHue, 7);
 }
 //======================================================================================
 void rainbowWithGlitter(){
@@ -234,7 +234,7 @@ void confetti(){
   // random colored speckles that blink in and fade smoothly
 //  fadeToBlackBy( leds[0], (iStripLength-iTopStar), 10);
   int pos = random16((iStripLength-iTopStar));
-//  leds[0][pos] += CHSV( gHue + random8(64), 200, 255);
+//  leds[0][pos] += CHSV( giMainHue + random8(64), 200, 255);
 }
 //======================================================================================
 void sinelon(byte iStrip){
@@ -242,7 +242,7 @@ void sinelon(byte iStrip){
   // a colored dot sweeping back and forth, with fading trails
 //  fadeToBlackBy( leds[iStrip], (iStripLength-iTopStar), 20);
   int pos = beatsin16( 13, 0, (iStripLength-iTopStar)-1 );
-//  leds[iStrip][pos] += CHSV( gHue, 255, 192);
+//  leds[iStrip][pos] += CHSV( giMainHue, 255, 192);
 }
 //======================================================================================
 void bpm(){
@@ -252,8 +252,8 @@ void bpm(){
   CRGBPalette16 palette = PartyColors_p;
   uint8_t beat = beatsin8( BeatsPerMinute, 64, 255);
   for( int i = 0; i < (iStripLength-iTopStar); i++) { //9948
-//    leds[0][i] = ColorFromPalette(palette, gHue+(i*2), beat-gHue+(i*10));
-    ledsA[i] = ColorFromPalette(palette, gHue+(i*2), beat-gHue+(i*10));
+//    leds[0][i] = ColorFromPalette(palette, giMainHue+(i*2), beat-giMainHue+(i*10));
+    ledsA[i] = ColorFromPalette(palette, giMainHue+(i*2), beat-giMainHue+(i*10));
   }
 }
 //======================================================================================
