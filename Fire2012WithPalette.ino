@@ -66,7 +66,7 @@ void setup() {
 void loop()
 {
   // Add entropy to random number generator; we use a lot of it.
-  random16_add_entropy( random());
+//  random16_add_entropy( random());
 
   // Fourth, the most sophisticated: this one sets up a new palette every
   // time through the loop, based on a hue that changes every time.
