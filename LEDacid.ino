@@ -33,10 +33,14 @@ Proposed modes:
 
 #define VOLTS              5
 #define MAX_MA             12000
-#define BRIGHTNESS         255
+#define BRIGHTNESS         128 //255
 //#define FRAMES_PER_SECOND  60
 const byte FRAMES_PER_SECOND = 60;
 #define NUM_STRIPS         2
+
+// ---------------------------------- Mark Kriegsman's Fire2012 ----------------------------------
+bool gReverseDirection = false;
+// ---------------------------------- Mark Kriegsman's Fire2012 ----------------------------------
 
 const byte iStripLength = 100;
 
@@ -44,7 +48,41 @@ const byte iStripLength = 100;
 CRGBArray<iStripLength> ledsA;
 CRGBArray<iStripLength> ledsB;
 
+//---------------------------------- Mark Kriegsman's TwinkleFOX ---------------
+CRGBPalette16 gCurrentPalette = RainbowColors_p;
+CRGBPalette16 gTargetPalette = RainbowColors_p;
+#define SECONDS_PER_PALETTE  30 //default 30
+//---------------------------------- Mark Kriegsman's TwinkleFOX ---------------
+
 WiFiServer server(80);
+
+// List of patterns to cycle through.  Each is defined as a separate function below.
+typedef void (*SimplePatternList[])();
+//SimplePatternList gPatterns = { rainbow, rainbowWithGlitter, confetti, sinelon, juggle, bpm };
+
+uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
+uint8_t gHue = 0; // rotating "base color" used by many of the patterns
+boolean bCyclePalettes = false;
+
+byte iTopStar=0;
+
+byte iLEDstatus=1; // 0 - off, 1 - on, 2 - paused
+byte iFlipBlue=0;
+byte iFlipRed=0;
+byte iOneColHue=88;
+
+uint8_t maxChanges = 24; 
+
+bool bFirstTimeRound = true;
+byte iUp = 1;
+byte iMode; // = O_SlowCycle;
+byte iModePrevious; // = O_SlowCycle;
+byte iHueMain = random8();
+byte iRG = 1;
+byte iYB = 1;
+
+const CRGBPalette16 Black_p = CRGBPalette16(CRGB::Black);
+
 //======================================================================================
 void setup() {
 //======================================================================================
@@ -93,9 +131,9 @@ void setup() {
   IPAddress myIP = WiFi.softAPIP();
   Serial.print("AP IP address: ");
   Serial.println(myIP);
-  //server.on("/", handleRoot);
-  server.begin();
-  Serial.println("HTTP server started");
+//  //server.on("/", handleRoot);
+//  server.begin();
+//  Serial.println("HTTP server started");
 
 //---------------------------------- WiFi Access Point -----------------
 /* */
@@ -111,7 +149,7 @@ void setup() {
 /* */
 //---------------------------------- Start the HTTP server -----------------
   server.begin();
-  Serial.println("Server started");
+  Serial.println("HTTP server started");
  
   // Print the IP address
   Serial.print("Use this URL : ");
@@ -123,27 +161,6 @@ void setup() {
   Serial.println(iIP);
 //---------------------------------- Start the HTTP server -----------------
 }
-// List of patterns to cycle through.  Each is defined as a separate function below.
-typedef void (*SimplePatternList[])();
-//SimplePatternList gPatterns = { rainbow, rainbowWithGlitter, confetti, sinelon, juggle, bpm };
-
-uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
-uint8_t gHue = 0; // rotating "base color" used by many of the patterns
-
-byte iTopStar=0;
-
-byte iLEDstatus=1; // 0 - off, 1 - on, 2 - paused
-byte iFlipBlue=0;
-byte iFlipRed=0;
-byte iOneColHue=88;
-
-bool bFirstTimeRound = true;
-byte iUp = 1;
-byte iMode; // = O_SlowCycle;
-byte iModePrevious; // = O_SlowCycle;
-byte iHueMain = random8();
-byte iRG = 1;
-byte iYB = 1;
 //======================================================================================
 void loop()
 //======================================================================================
@@ -153,6 +170,14 @@ void loop()
 //  Serial.println(iLEDstatus);
   if (iLEDstatus >= 1){
     if (iLEDstatus == 1){
+      if (bCyclePalettes){
+        EVERY_N_SECONDS( SECONDS_PER_PALETTE ) { 
+          chooseNextColorPalette( gTargetPalette ); 
+        }
+      }
+      EVERY_N_MILLISECONDS(14) {
+        nblendPaletteTowardPalette(gCurrentPalette, gTargetPalette, maxChanges);
+      }
       doLEDs();
     }
     bFirstTimeRound = false;
