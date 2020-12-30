@@ -1,46 +1,3 @@
-// Patterns
-const byte O_Still = 99;
-const byte O_SlowCycle = 0;
-const byte O_Cascade = 111;
-const byte O_TwinCascade = 1;
-const byte O_Sparkle = 5;
-const byte O_FireWater = 15;
-const byte O_Fire = 17;
-const byte O_Water = 16;
-const byte O_TwinkleFOX = 18;
-
-//Specials
-const byte O_SantaHat = 2;
-const byte O_Lightning = 3;
-const byte O_TwinkleStar = 4;
-const byte O_SparkleStar = 112;
-const byte O_Police = 6;
-const byte O_Classic = 12;
-const byte O_PausePlay = 254;
-const byte O_FadeOut = 255;
-
-//Palettes
-const byte O_TwinkleFOXfairy = 20;
-const byte O_CloudColors = 21;
-const byte O_RainbowColors = 22;
-const byte O_LavaColors = 23;
-const byte O_OceanColors = 24;
-const byte O_ForestColors = 25;
-const byte O_RainbowStripeColors = 26;
-const byte O_PartyColors = 27;
-const byte O_WhiteGold = 28;
-const byte O_Fire_p = 29;
-const byte O_Water_p = 30;
-const byte O_Blorange = 31;
-const byte O_Classic_p = 32;
-const byte O_Holly = 33;
-const byte O_RedWhite = 34;
-const byte O_Pastel = 35;
-const byte O_Stars = 36;
-const byte O_Grurple = 37;
-const byte O_AquaGray = 38;
-const byte O_OneColour = 39;
-
 // =============================================================================
 void doWeb() {
 // =============================================================================
@@ -49,26 +6,26 @@ void doWeb() {
   if (!client) {
     return;
   }
- 
+
   // Wait until the client sends some data
   Serial.println("New client");
   while(!client.available()){
     FastLED.delay(1);
   }
- 
+
   // Read the first line of the request
   String request = client.readStringUntil('\r');
   Serial.println(request);
   client.flush();
 
   // Match the request
-  if (request.indexOf("/LED=254") != -1) {
+  if (request.indexOf("/LED=" + String(O_PausePlay)) != -1) {
     if (iLEDstatus == 2) {
       iLEDstatus = 1;
     } else {
       iLEDstatus = 2;
     }
-  } else if (request.indexOf("/LED=255") != -1 || request.indexOf("/LED=254") != -1) {
+  } else if (request.indexOf("/LED=" + String(O_FadeOut)) != -1 || request.indexOf("/LED=" + String(O_PausePlay)) != -1) {
     iLEDstatus = 0;
   }else{
     if (request.indexOf("/LED=") != -1) {
@@ -76,6 +33,9 @@ void doWeb() {
       iModePrevious = iMode;
       iMode = request.substring(request.indexOf("/LED=")+5, request.indexOf(" HTTP")).toInt();
       bFirstTimeRound = true;
+      if (request.indexOf("/Hue=" + String(O_OneColour)) != -1) {
+        iOneColHue = request.substring(request.indexOf("/Hue=")+5, request.indexOf(" HTTP")).toInt();
+      }
     }
   }
   // Display Web Page
@@ -89,7 +49,7 @@ void doWeb() {
   client.println("    <meta charset=\"UTF-8\">");
   client.println("    <title>LEDacid Menu</title>");
   client.println("    <style>");
-  client.println("* {margin: 0; padding:0; box-sizing: border-box; font-family: 'Helvetica', Arial; font-weight: bold; font-size: xx-large;}");
+  client.println("* {margin: 0; padding:0; box-sizing: border-box; font-family: 'Helvetica', Arial; font-weight: bold; font-size: large;}");
   client.println("body { background-color: #EEE; }");
   client.println("#list {");
   client.println("  display: block;");
@@ -103,8 +63,9 @@ void doWeb() {
   client.println("}");
   client.println("@media only screen and (min-width: 650px) {");
   client.println("  #list li {");
-  client.println("    float: left; width: 48%;");
 //  client.println("    float: left; width: 98%;");
+//  client.println("    float: left; width: 48%;");
+  client.println("    float: left; width: 31%;");
   client.println("  }");
   client.println("}");
   client.println("#list li a {");
@@ -128,51 +89,69 @@ void doWeb() {
   client.println("  </head>");
   client.println("  <body>");
   client.println("    <ul id=\"list\">");
+  client.println("      <p align=center>-~=#X ----- Old Favourites ----- X#=~-</p>"); // <========================================================== dodgy carl code!
+  client.println("      <li><a href='LED=" + String(O_TwinkleFOXClassic) +                    "'>Twinkle Fairy</a></li>");
+  client.println("      <li><a href='LED=" + String(O_SlowCycleRainbow) +                     "'>Rainbow Slow Cycle</a></li>");
+  client.println("      <li><a href='LED=" + String(O_TwinkleFOXHolly) +                      "'>Twinkle Holly</a></li>");
+  
+  client.println("      <li><a href='LED=" + String(O_SlowCycleRainbowStripe) +               "'>Rainbow Trickle</a></li>");
+  client.println("      <li><a href='LED=" + String(O_SparkleStar) +                          "'>Sparkle Stars</a></li>");
+  client.println("      <li><a href='LED=" + String(O_SparkleWhiteGold) +                     "'>WhiteGold Sparkle</a></li>");
+  
+  client.println("      <li><a href='LED=" + String(O_Snowing) +                              "'>It&rsquo;s Snowing!</a></li>");
+  client.println("      <li><a href='LED=" + String(O_TwinkleStar) +                          "'>Twinkle, Twinkle Little Star</a></li>");
+  client.println("      <li><a href='LED=" + String(O_SparkleBlorange) +                      "'>Sparkle Blorange</a></li>");
+//  client.println("      <p align=center>-~=#X ----- Specials ----- X#=~-</p>"); // <========================================================== dodgy carl code!
+  client.println("      <li><a href='LED=" + String(O_Fire) +                                 "'>Fire</a></li>");
+  client.println("      <li><a href='LED=" + String(O_Water) +                                "'>Water</a></li>");
+  client.println("      <li><a href='LED=" + String(O_SantaHat) +                             "'>Santa&rsquo;s Hat</a></li>");
+  
+  client.println("      <li><a href='LED=" + String(O_Lightning) +                            "'>Lightning</a></li>");
+  client.println("      <li><a href='LED=" + String(O_Police) +                               "'>Stop - Police!</a></li>");
+  client.println("      <li><a href='LED=" + String(O_SlowCycle) +                            "'>-</a></li>");
   client.println("      <p align=center>-~=#X ----- Patterns ----- X#=~-</p>"); // <========================================================== dodgy carl code!
-//  client.println("      <li><a href='LED=99'>Still</a></li>");
-  client.println("      <li><a href='LED=" + String(O_Still) + "'>Still</a></li>");
-  client.println("      <li><a href='LED=" + String(O_SlowCycle) + "'>Slow Cycle</a></li>");
-  client.println("      <li><a href='LED=" + String(O_TwinkleFOX) + "'>TwinkleFOX</a></li>");
-  client.println("      <li><a href='LED=" + String(O_Sparkle) + "'>Sparkle</a></li>");
-  client.println("      <li><a href='LED=" + String(O_Cascade) + "'>Cascade</a></li>");
-  client.println("      <li><a href='LED=" + String(O_TwinCascade) + "'>Twin Cascade</a></li>");
-  client.println("      <li><a href='LED=" + String(O_FireWater) + "'>Fire / Water</a></li>");
-  client.println("      <li><a href='LED=0'>-</a></li>");
-  client.println("      <p align=center>-~=#X ----- Specials ----- X#=~-</p>"); // <========================================================== dodgy carl code!
-  client.println("      <li><a href='LED=" + String(O_Fire) + "'>Fire</a></li>");
-  client.println("      <li><a href='LED=" + String(O_Water) + "'>Water</a></li>");
-  client.println("      <li><a href='LED=" + String(O_SantaHat) + "'>Santa&lsquo;s Hat</a></li>");
-  client.println("      <li><a href='LED=" + String(O_Lightning) + "'>Lightning</a></li>");
-  client.println("      <li><a href='LED=" + String(O_TwinkleStar) + "'>Twinkle, Twinkle Little Star</a></li>");
-  client.println("      <li><a href='LED=" + String(O_SparkleStar) + "'>Sparkle Stars</a></li>");
-  client.println("      <li><a href='LED=" + String(O_Police) + "'>Stop - Police!</a></li>");
-  client.println("      <li><a href='LED=12'>Classic</a></li>");
-//  client.println("      <li><a href='LED=0'>-</a></li>");
-  client.println("      <li><a href='LED=254'>Pause / Play</a></li>");
-  client.println("      <li><a href='LED=255'>Fade &lsquo;em out</a></li>");
-  client.println("      <p align=center>-~=#X ----- Colour Schemes ----- X#=~-</p>"); // <========================================================== dodgy carl code!
-  client.println("      <li><a href='LED=22'>RainbowColors</a></li>");
-  client.println("      <li><a href='LED=26'>RainbowStripeColors</a></li>");
-  client.println("      <li><a href='LED=27'>PartyColors</a></li>");
-  client.println("      <li><a href='LED=32'>Classic</a></li>");
-  client.println("      <li><a href='LED=29'>Fire</a></li>");
-  client.println("      <li><a href='LED=23'>LavaColors</a></li>");
-  client.println("      <li><a href='LED=30'>Water</a></li>");
-  client.println("      <li><a href='LED=24'>OceanColors</a></li>");
-  client.println("      <li><a href='LED=21'>CloudColors</a></li>");
-  client.println("      <li><a href='LED=25'>ForestColors</a></li>");
-  client.println("      <li><a href='LED=28'>WhiteGold</a></li>");
-  client.println("      <li><a href='LED=31'>Blorange</a></li>");
-  client.println("      <li><a href='LED=37'>Grurple</a></li>");
-  client.println("      <li><a href='LED=38'>AquaGray</a></li>");
-  client.println("      <li><a href='LED=33'>Holly</a></li>");
-  client.println("      <li><a href='LED=34'>RedWhite</a></li>");
-  client.println("      <li><a href='LED=35'>Pastel</a></li>");
-  client.println("      <li><a href='LED=20'>TwinkleFOX fairy</a></li>");
-  client.println("      <li><a href='LED=36'>Stars</a></li>");
-//  client.println("      <li><a href='LED=39'>All One Colour:</a></li>");
-//  client.println("      <li><form><input type='text' name='Hue' value='167'></form></li>"); // <========================================================== dodgy carl code!
-//  client.println("      <form><input type='text' name='Hue' value='" + iOneColHue + "'></form>"); // <========================================================== dodgy carl code!
+  client.println("      <li><a href='LED=" + String(O_Still) +                                "'>Still</a></li>");
+  client.println("      <li><a href='LED=" + String(O_FadePalette) +                          "'>Fade Palette</a></li>");
+  client.println("      <li><a href='LED=" + String(O_SlowCycle) +                            "'>Slow Cycle</a></li>");
+  client.println("      <li><a href='LED=" + String(O_TwinkleFOX) +                           "'>Twinkle</a></li>");
+  client.println("      <li><a href='LED=" + String(O_SparkleSoft) +                          "'>Soft Sparkle</a></li>");
+  client.println("      <li><a href='LED=" + String(O_SparkleHard) +                          "'>Sparkle</a></li>");
+  client.println("      <li><a href='LED=" + String(O_FireWater) +                            "'>Fire / Water</a></li>");
+  client.println("      <li><a href='LED=" + String(O_Cascade) +                              "'>Cascade</a></li>");
+  client.println("      <li><a href='LED=" + String(O_TwinCascade) +                          "'>Twin Cascade</a></li>");
+  client.println("      <li><a href='LED=" + String(O_Classic) +                              "'>Classic</a></li>");
+  client.println("      <li><a href='LED=" + String(O_TopStar) +                              "'>Top Star</a></li>");
+  client.println("      <li><a href='LED=" + String(O_PausePlay) +                            "'>Pause / Play</a></li>");
+  client.println("      <li><a href='LED=" + String(O_FadeOut) +                              "'>Fade &lsquo;em out</a></li>");
+  client.println("      <p align=center>-~=#X ----- Palettes ----- X#=~-</p>"); // <========================================================== dodgy carl code!
+  client.println("      <li><a href='LED=" + String(O_RainbowColors_p) +                       "'>RainbowColors</a></li>");
+  client.println("      <li><a href='LED=" + String(O_RainbowStripeColors_p) +                 "'>RainbowStripeColors</a></li>");
+  client.println("      <li><a href='LED=" + String(O_RuGBY_p) +                               "'>RuGBY</a></li>");
+  client.println("      <li><a href='LED=" + String(O_PartyColors_p) +                         "'>PartyColors</a></li>");
+  client.println("      <li><a href='LED=" + String(O_Pastel_p) +                              "'>Pastel</a></li>");
+  client.println("      <li><a href='LED=" + String(O_Dawn_p) +                                "'>Dawn</a></li>");
+  client.println("      <li><a href='LED=" + String(O_Fire_p) +                                "'>Fire</a></li>");
+  client.println("      <li><a href='LED=" + String(O_Water_p) +                               "'>Water</a></li>");
+  client.println("      <li><a href='LED=" + String(O_OceanColors_p) +                         "'>OceanColors</a></li>");
+  client.println("      <li><a href='LED=" + String(O_CloudColors_p) +                         "'>CloudColors</a></li>");
+  client.println("      <li><a href='LED=" + String(O_ForestColors_p) +                        "'>ForestColors</a></li>");
+  client.println("      <li><a href='LED=" + String(O_WhitePurple_p) +                         "'>WhitePurple</a></li>");
+  client.println("      <li><a href='LED=" + String(O_WhiteGold_p) +                           "'>WhiteGold</a></li>");
+  client.println("      <li><a href='LED=" + String(O_Blorange_p) +                            "'>Blorange</a></li>");
+  client.println("      <li><a href='LED=" + String(O_Aquorange_p) +                           "'>Aquorange</a></li>");
+  client.println("      <li><a href='LED=" + String(O_Grurple_p) +                             "'>Grurple</a></li>");
+  client.println("      <li><a href='LED=" + String(O_Ruthies_p) +                            "'>Ruthie&rsquo;s</a></li>");
+  client.println("      <li><a href='LED=" + String(O_AquaGray_p) +                            "'>AquaGray</a></li>");
+  client.println("      <li><a href='LED=" + String(O_Holly_p) +                               "'>Holly</a></li>");
+  client.println("      <li><a href='LED=" + String(O_FairyLight_p) +                          "'>Fairy Lights</a></li>");
+  client.println("      <li><a href='LED=" + String(O_Stars_p) +                               "'>Stars</a></li>");
+  client.println("      <li><a href='LED=" + String(O_SantaHat_p) +                            "'>Santa&rsquo;s Hat</a></li>");
+  client.println("      <li><a href='LED=" + String(O_Monochrome_p) +                          "'>Monochrome</a></li>");
+  client.println("      <li><a href='LED=" + String(O_Black_p) +                               "'>Black</a></li>");
+//  client.println("      <li><a href='LED=" + String(O_OneColour) +                              "&Hue=0'>All One Colour:</a></li>");
+//  client.println("      <form><input type='text' name='Hue' value='" + String(iOneColHue) + "'></form>"); // <========================================================== dodgy carl code!
+//  client.println("      <input type='range' min='0' max='255' value='128' class='slider' id='iOneColHue'>"); // <========================================================== dodgy carl code!
+//  client.println('      <form action="/get"><input type="hidden" id="LED" value="' + String(O_OneColour) + '"><input type="range" min="0" max="255" value="128" class="slider" id="OneColHue"><input type="submit" value="All One Colour"></form>');
   client.println("    </ul><br><br><br>");
   client.println("  </body>");
   client.println("</html>");
