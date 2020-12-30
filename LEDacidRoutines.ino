@@ -13,20 +13,28 @@ uint8_t ledstart;                                             // Starting locati
 uint8_t ledlen;                                               // Length of a flash
 //---------------------------------- lightning --------------------------------
 // =============================================================================
-void Sparkle(boolean bHard){
+void Sparkle(byte iHard){
 // =============================================================================
 //      gCurrentPalette = gTargetPalette;
 
-  if (bHard){
-//    ledsA.fadeToBlackBy(10);
-//    ledsB.fadeToBlackBy(10);
-  }else{
-    ledsA.fadeLightBy(10);
-    ledsB.fadeLightBy(10);
+  switch (iHard){
+    case 0:
+      ledsA.fadeToBlackBy(10);
+      ledsB.fadeToBlackBy(10);
+      break;
+    case 1:
+      ledsA.fadeLightBy(14);
+      ledsB.fadeLightBy(14);
+      break;
+//    case 2:
+//      ledsA.fadeLightBy(100);
+//      ledsB.fadeToBlackBy(1);
+//      break;
   }
   ledsA[random8(iStripLength-iTopStar)] = ColorFromPalette(gCurrentPalette, random8());
   ledsB[random8(iStripLength-iTopStar)] = ColorFromPalette(gCurrentPalette, random8());
-  FastLED.delay(5);
+
+  FastLED.show();
 }
 // =============================================================================
 void setTopStar(){
@@ -186,11 +194,14 @@ void doLEDs(){
         ledsB((iStripLength-iTopStar-1)/2,(iStripLength-iTopStar)-1) = ledsB((iStripLength-iTopStar-1)/2 - 1 ,0);
       }
       break;
-    case O_SparkleHard:
-      Sparkle(true);
+    case O_Sparkle:
+      Sparkle(0);
       break;
-    case O_SparkleSoft:
-      Sparkle(false);
+    case O_Shimmer:
+      Sparkle(1);
+      break;
+    case O_Shuffle:
+      Sparkle(2);
       break;
     case O_TwinkleFOX:
       drawTwinkles(ledsA);
@@ -348,7 +359,7 @@ void doLEDs(){
       }
       gTargetPalette = Stars_p;
       gCurrentPalette = Stars_p;
-      iMode = O_SparkleSoft;
+      iMode = O_Shimmer;
       bCyclePalettes=false;
       break;
     case O_SparkleWhiteGold:
@@ -357,7 +368,7 @@ void doLEDs(){
       }
       gTargetPalette = WhiteGold_p;
       gCurrentPalette = WhiteGold_p;
-      iMode = O_SparkleHard;
+      iMode = O_Sparkle;
       bCyclePalettes=false;
       break;
     case O_TwinkleFOXHolly:
@@ -378,7 +389,7 @@ void doLEDs(){
       }
       gTargetPalette = Blorange_p;
       gCurrentPalette = Blorange_p;
-      iMode = O_SparkleSoft;
+      iMode = O_Shimmer;
       bCyclePalettes=false;
       break;
 // --------------------------------------- Old Favourites ---------------------------------------
@@ -501,6 +512,10 @@ void doLEDs(){
       break;
     case O_Black_p:
       gTargetPalette = Black_p;
+      iMode = iModePrevious;
+      break;
+    case O_White_p:
+      gTargetPalette = White_p;
       iMode = iModePrevious;
       break;
 // ------------------------------------------ Palettes ------------------------------------------
