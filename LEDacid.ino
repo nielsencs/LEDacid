@@ -1,17 +1,36 @@
 /*
 LEDacid - adding a bit more 'ooooh' to Christmas tree lights
 
+To use- set the relevant connections below, then upload the sketch and get the IP address (e.g. 192.168.0.42)
+from the serial monitor; browse via same wifi router and away we go!
+*/
+
+const char* tSSID = "SKYB0BD0";
+const char* tPass = "FQYFSCWDTB";
+//const char* tSSID = "MiSMK";
+//const char* tPass = "3M3n1nSh3ds12";
+//const char* tSSID = "LEDacid";
+//const char* tPass = "thereisnospoon";
+
+const byte iStripLength = 100; // max 254 unless vars changed from 'byte' - 255 used to set whole strip
+
+/*
 Power consumption: If all WS2812s are full white, 60 mA per dot - 100 dots = 6 Amps
 
 Proposed modes:
--standard Christmas tree lights for a bit - white pulse or flash or colour cycle - one colour per dot 
+- standard Christmas tree lights for a bit - white pulse or flash or colour cycle - one colour per dot 
   then white band travels up tree, turns golden and grows down to fill tree
--starlight sparkle
--fading tail of moving dot
--rainbow sparkle
+- starlight sparkle
+- fading tail of moving dot
+- rainbow sparkle
+- Police - red blue flashing
+- one colour
+- upload palette from app/web menu?
+- control knobs on 3D printed case?
+- Sound effects? (great for police, fire or explosion!)
 */
 // ==== FastLED includes =======================================================
-#include <bitswap.h>
+//#include <bitswap.h>
 #include <chipsets.h>
 #include <color.h>
 #include <colorpalettes.h>
@@ -41,23 +60,57 @@ Proposed modes:
 // ==== FastLED includes =======================================================
 #include <ESP8266WiFi.h>
 
-const byte iStripLength = 100; // max 254 unless vars changed from 'byte' - 255 used to set whole strip
+// Patterns
+const byte O_Still = 99;
+const byte O_SlowCycle = 0;
+const byte O_Cascade = 111;
+const byte O_TwinCascade = 1;
+const byte O_Sparkle = 5;
+const byte O_FireWater = 15;
+const byte O_Fire = 17;
+const byte O_Water = 16;
+const byte O_TwinkleFOX = 18;
 
-const char* tSSID = "SKYA7448";
-const char* tPass = "BXTYCFUS";
-//const char* tSSID = "MiSMK";
-//const char* tPass = "3M3n1nSh3ds12";
+//Specials
+const byte O_SantaHat = 2;
+const byte O_Lightning = 3;
+const byte O_TwinkleStar = 4;
+const byte O_SparkleStar = 112;
+const byte O_Police = 6;
+const byte O_Classic = 12;
+const byte O_PausePlay = 254;
+const byte O_FadeOut = 255;
 
-#define DATA_PIN 5
-const byte BRIGHTNESS = 64;
-//const byte BRIGHTNESS = 255;
+//Palettes
+const byte O_TwinkleFOXfairy = 20;
+const byte O_CloudColors = 21;
+const byte O_RainbowColors = 22;
+const byte O_LavaColors = 23;
+const byte O_OceanColors = 24;
+const byte O_ForestColors = 25;
+const byte O_RainbowStripeColors = 26;
+const byte O_PartyColors = 27;
+const byte O_WhiteGold = 28;
+const byte O_Fire_p = 29;
+const byte O_Water_p = 30;
+const byte O_Blorange = 31;
+const byte O_Classic_p = 32;
+const byte O_Holly = 33;
+const byte O_RedWhite = 34;
+const byte O_Pastel = 35;
+const byte O_Stars = 36;
+const byte O_Grurple = 37;
+const byte O_AquaGray = 38;
+const byte O_OneColour = 39;
+
+#define DATA_PIN 4
+//const byte BRIGHTNESS = 64;
+const byte BRIGHTNESS = 255;
 
 //---------------------------------- Mark Kriegsman's Fire2012 -----------------
 //#define FRAMES_PER_SECOND 60
 const byte FRAMES_PER_SECOND = 60;
 bool gReverseDirection = false;
-
-//CRGB leds[NUM_LEDS];
 
 // Fire2012 with programmable Color Palette
 //
@@ -85,77 +138,14 @@ bool gReverseDirection = false;
 //
 // The dynamic palette shows how you can change the basic 'hue' of the
 // color palette every time through the loop, producing "rainbow fire".
-
-CRGBPalette16 gPalFire;
-CRGBPalette16 gPalWater;
 //---------------------------------- Mark Kriegsman's Fire2012 -----------------
 
 WiFiServer server(80);
 
-boolean bLEDsOn=false;
-
-/*const TProgmemRGBPalette16 Blorange_p =
-{
-*/ /*  0xFF1040
-
-255 FF
-238 EE
-221 DD
-204 CC
-187 BB
-170 AA
-153 99
-136 88
-128 80
-119 77
-111 6F
-102 66
- 94 5E
- 85 55
- 77 4D
- 68 44
- 60 3C
- 51 33
- 43 2B
- 34 22
- 26 1A
- 18 11
-  9 09
-  0 00
-*/ /*  
-  0xFF8000, 0xEE7711, 0xDD6F22, 0xCC6633,
-  0xBB5E44, 0xAA5555, 0x994D66, 0x884477,
-  0x773C88, 0x663399, 0x552BAA, 0x4422BB,
-  0x331ACC, 0x2211DD, 0x1109EE, 0x0000FF
-}; */
-
-const TProgmemRGBPalette16 Blorange_p =
-{  CRGB::Orange,      CRGB::Orange,      CRGB::LightYellow, CRGB::Orange, 
-   CRGB::Tan,         CRGB::SlateGray,   CRGB::Tan,         CRGB::SlateGray, 
-   CRGB::PapayaWhip,  CRGB::SlateGray,   CRGB::Aqua,        CRGB::SlateGray, 
-   CRGB::DeepSkyBlue, CRGB::SlateBlue,   CRGB::Blue,        CRGB::Blue };
-
-const TProgmemRGBPalette16 WhiteGold_p =
-{  CRGB::White,      CRGB::Gold,        CRGB::LightYellow, CRGB::Orange, 
-   CRGB::Yellow,     CRGB::White,       CRGB::Orange,      CRGB::White, 
-   CRGB::PapayaWhip, CRGB::White,       CRGB::Orange,      CRGB::White, 
-   CRGB::Gold,       CRGB::LightYellow, CRGB::Yellow,      CRGB::Orange };
-
-const TProgmemRGBPalette16 Classic_p =
-{
-  CRGB::Red, CRGB::Gold, CRGB::Green, CRGB::Blue,
-  CRGB::Red, CRGB::Gold, CRGB::Green, CRGB::Blue,
-  CRGB::Red, CRGB::Gold, CRGB::Green, CRGB::Blue,
-  CRGB::Red, CRGB::Gold, CRGB::Green, CRGB::Blue
-};
-
-const TProgmemRGBPalette16 Pastel_p =
-{
-  0x401010, 0x404010, 0x404040, 0x104040,
-  0x104010, 0x104040, 0x404040, 0x401040,
-  0x101040, 0x401040, 0x404040, 0x404010,
-  0x100808, 0x081008, 0x081010, 0x000000
-};
+byte iLEDstatus=0; // 0 - off, 1 - on, 2 - paused
+byte iFlipBlue=0;
+byte iFlipRed=0;
+byte iOneColHue=167;
 
 //---------------------------------- Mark Kriegsman's TwinkleFOX ---------------
 // A pure "fairy light" palette with some brightness variations
@@ -186,6 +176,93 @@ const TProgmemRGBPalette16 RedWhite_p =
    CRGB::Gray, CRGB::Gray, CRGB::Gray, CRGB::Gray };
 //---------------------------------- Mark Kriegsman's TwinkleFOX ---------------
 
+/*  0xFF1040
+
+255 FF
+238 EE
+221 DD
+204 CC
+187 BB
+170 AA
+153 99
+136 88
+128 80
+119 77
+111 6F
+102 66
+ 94 5E
+ 85 55
+ 77 4D
+ 68 44
+ 60 3C
+ 51 33
+ 43 2B
+ 34 22
+ 26 1A
+ 18 11
+  9 09
+  0 00
+*/ 
+
+/*const TProgmemRGBPalette16 Blorange_p =
+{ 
+  0xFF8000, 0xEE7711, 0xDD6F22, 0xCC6633,
+  0xBB5E44, 0xAA5555, 0x994D66, 0x884477,
+  0x773C88, 0x663399, 0x552BAA, 0x4422BB,
+  0x331ACC, 0x2211DD, 0x1109EE, 0x0000FF
+}; */
+
+const TProgmemRGBPalette16 AquaGray_p =
+{  CRGB::Aqua,         CRGB::Gray,        CRGB::Aqua,         CRGB::Gray,
+   CRGB::Aqua,         CRGB::Gray,        CRGB::Aqua,         CRGB::Gray,
+   CRGB::Aqua,         CRGB::Gray,        CRGB::Aqua,         CRGB::Gray,
+   CRGB::Aqua,         CRGB::Gray,        CRGB::Aqua,         CRGB::Gray};
+
+const TProgmemRGBPalette16 Grurple_p =
+{  CRGB::Green,        CRGB::Green,       CRGB::Green,        CRGB::Purple,
+   CRGB::DarkGreen,    CRGB::DarkGreen,   CRGB::Indigo,       CRGB::Green,
+   CRGB::Blue,         CRGB::Magenta,     CRGB::Aqua,         CRGB::Orchid,
+   CRGB::MidnightBlue, CRGB::DarkGreen,   CRGB::Purple,       CRGB::Plum };
+
+const TProgmemRGBPalette16 Blorange_p =
+{  CRGB::DarkOrange,   CRGB::Orange,      CRGB::LightYellow,  CRGB::Orange,
+   CRGB::Tan,          CRGB::DarkOrange,  CRGB::Tan,          CRGB::DarkBlue,
+   CRGB::PapayaWhip,   CRGB::SlateGray,   CRGB::Aqua,         CRGB::DarkOrange,
+   CRGB::DeepSkyBlue,  CRGB::SlateBlue,   CRGB::Blue,         CRGB::Orange };
+
+const TProgmemRGBPalette16 WhiteGold_p =
+{  CRGB::White,       CRGB::Orange,       CRGB::White,        CRGB::White, 
+   CRGB::White,       CRGB::White,        CRGB::LightYellow,  CRGB::White, 
+   CRGB::PapayaWhip,  CRGB::White,        CRGB::White,        CRGB::White, 
+   CRGB::White,       CRGB::White,        CRGB::White,        CRGB::LemonChiffon };
+
+const TProgmemRGBPalette16 Classic_p =
+{
+  CRGB::Red, CRGB::Gold, CRGB::Green, CRGB::Blue,
+  CRGB::Red, CRGB::Gold, CRGB::Green, CRGB::Blue,
+  CRGB::Red, CRGB::Gold, CRGB::Green, CRGB::Blue,
+  CRGB::Red, CRGB::Gold, CRGB::Green, CRGB::Blue
+};
+
+const TProgmemRGBPalette16 Stars_p =
+{
+  0xFFFFFF, 0x100010, 0x100010, 0x100010,
+  0x100010, 0x100010, 0x100010, 0x100010,
+  0x100010, 0x100010, 0x100010, 0x100010,
+  0x100010, 0x100010, 0x100010, 0x100010
+};
+
+const TProgmemRGBPalette16 Pastel_p =
+{
+  0x401010, 0x404010, 0x404040, 0x104040,
+  0x104010, 0x104040, 0x404040, 0x401040,
+  0x101040, 0x401040, 0x404040, 0x404010,
+  0x100808, 0x081008, 0x081010, 0x000000
+};
+
+CRGBPalette16 gPalFire;
+CRGBPalette16 gPalWater;
+
 //---------------------------------- Mark Kriegsman's TwinkleFOX ---------------
 #if defined(FASTLED_VERSION) && (FASTLED_VERSION < 3001000)
 #warning "Requires FastLED 3.1 or later; check github for latest code."
@@ -197,7 +274,7 @@ const TProgmemRGBPalette16 RedWhite_p =
 //#define DATA_PIN        5
 //#define CLK_PIN       4
 #define VOLTS          5
-#define MAX_MA       4000
+#define MAX_MA       12000
 
 //  TwinkleFOX: Twinkling 'holiday' lights that fade in and out.
 //  Colors are chosen from a palette; a few palettes are provided.
@@ -295,18 +372,16 @@ CRGB gBackgroundColor = CRGB::Black;
 // incandescent bulbs change color as they dim down.
 #define COOL_LIKE_INCANDESCENT 0
 
-CRGBPalette16 gCurrentPalette;
-CRGBPalette16 gTargetPalette;
+CRGBPalette16 gCurrentPalette = RainbowColors_p;
+CRGBPalette16 gTargetPalette = RainbowColors_p;
 //---------------------------------- Mark Kriegsman's TwinkleFOX ---------------
-
-// This is an array of leds.  One item for each led in your strip.
-//CRGB leds[iStripLength];
-CRGBArray<iStripLength> leds;
+CRGBArray<iStripLength> ledsA;
+CRGBArray<iStripLength> ledsB;
 
 bool bFirstTimeRound = true;
 byte iUp = 1;
-byte iMode = 0;
-byte iModePrevious = 0;
+byte iMode = O_SlowCycle;
+byte iModePrevious = O_SlowCycle;
 byte iHueMain = random8();
 byte iRG = 1;
 byte iYB = 1;
@@ -354,17 +429,17 @@ void setup() {
 //---------------------------------- Mark Kriegsman's TwinkleFOX ---------------
   FastLED.setMaxPowerInVoltsAndMilliamps( VOLTS, MAX_MA);
 //  FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, NUM_LEDS)
-  FastLED.addLeds<WS2812, DATA_PIN, RGB>(leds, iStripLength)
-    .setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<WS2812, 4, RGB>(ledsA, iStripLength).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<WS2812, 5, RGB>(ledsB, iStripLength).setCorrection(TypicalLEDStrip);
 
-  chooseNextColorPalette(gTargetPalette); //, 99);
+//  chooseNextColorPalette(gTargetPalette); //, 99);
 //---------------------------------- Mark Kriegsman's TwinkleFOX ---------------
 // Uncomment one of the following lines for your leds arrangement.
   // FastLED.addLeds<TM1803, DATA_PIN, RGB>(leds, iStripLength);
   // FastLED.addLeds<TM1804, DATA_PIN, RGB>(leds, iStripLength);
   // FastLED.addLeds<TM1809, DATA_PIN, RGB>(leds, iStripLength);
   // FastLED.addLeds<WS2811, DATA_PIN, RGB>(leds, iStripLength);
-  FastLED.addLeds<WS2812, DATA_PIN, RGB>(leds, iStripLength);
+//  FastLED.addLeds<WS2812, DATA_PIN, RGB>(leds, iStripLength);
   // FastLED.addLeds<WS2812B, DATA_PIN, RGB>(leds, iStripLength);
   // FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, iStripLength);
   // FastLED.addLeds<APA104, DATA_PIN>(leds, iStripLength);
@@ -395,10 +470,16 @@ void setup() {
 
 // -------- countdown ----------------------------------------------------------
   for (byte i = 5; i > 0; i--){
-    leds[i-1] = CRGB::Red;
+    ledsA[i-1] = CRGB::Red;
+    ledsA[iStripLength-i] = CRGB::Red;
+    ledsB[i-1] = CRGB::Green;
+    ledsB[iStripLength-i] = CRGB::Green;
     FastLED.show();
     FastLED.delay(700);
-    leds[i-1] = CRGB::Black;
+    ledsA[i-1] = CRGB::Black;
+    ledsA[iStripLength-i] = CRGB::Black;
+    ledsB[i-1] = CRGB::Black;
+    ledsB[iStripLength-i] = CRGB::Black;
     FastLED.show();
     FastLED.delay(300);
   }
@@ -408,7 +489,23 @@ void setup() {
   Serial.println();
   Serial.print("Connecting to ");
   Serial.println(tSSID);
- 
+
+//---------------------------------- WiFi Access Point -----------------
+//Serial.print("Configuring access point...");
+/* You can remove the password parameter if you want the AP to be open. */
+/* /
+WiFi.softAP(tSSID, tPass);
+
+IPAddress myIP = WiFi.softAPIP();
+Serial.print("AP IP address: ");
+Serial.println(myIP);
+//server.on("/", handleRoot);
+server.begin();
+Serial.println("HTTP server started");
+/ */
+//---------------------------------- WiFi Access Point -----------------
+/* */
+//---------------------------------- Connect to WiFi -----------------
   WiFi.begin(tSSID, tPass);
  
   while (WiFi.status() != WL_CONNECTED) {
@@ -417,8 +514,9 @@ void setup() {
   }
   Serial.println("");
   Serial.println("WiFi connected");
- 
-  // Start the server
+/* */
+//---------------------------------- Connect to WiFi -----------------
+//---------------------------------- Start the HTTP server -----------------
   server.begin();
   Serial.println("Server started");
  
@@ -427,27 +525,26 @@ void setup() {
   Serial.print("http://");
   Serial.print(WiFi.localIP());
   Serial.println("/");
-
+//---------------------------------- Start the HTTP server -----------------
 /*      for (byte i = 0; i < iStripLength; i++){
-        leds[i] = CHSV(i + random8(0, 256-iStripLength), 255, 255);
+        ledsA[i] = CHSV(i + random8(0, 256-iStripLength), 255, 255);
         FastLED.show();        
       }*/
 }
 // =============================================================================
 void loop() {
 // =============================================================================
+  iLEDstatus = 0; // 1=LEDs on 0=LEDs off (1 for testing without the webserver)
   doWeb();
-//  bLEDsOn = true; // for testing without the webserver
-  if (bLEDsOn){
-    doLEDs();
+  if (iLEDstatus >= 1){
+    if (iLEDstatus == 1){
+      doLEDs();
+    }
     bFirstTimeRound = false;
   }else{
-    //EVERY_N_MILLISECONDS(33) {
-    for(int i = 0; i < iStripLength/2; i++) {   
-      // fade everything out
-      leds.fadeToBlackBy(20);
-      FastLED.delay(33);
-    }
+//    ledsA.fadeToBlackBy(14);
+//    ledsB.fadeToBlackBy(14);
+    FastLED.delay(33);
   }
 }
 // =============================================================================
@@ -460,7 +557,7 @@ void doWeb() {
   }
  
   // Wait until the client sends some data
-  Serial.println("new client");
+  Serial.println("New client");
   while(!client.available()){
     FastLED.delay(1);
   }
@@ -469,13 +566,19 @@ void doWeb() {
   String request = client.readStringUntil('\r');
   Serial.println(request);
   client.flush();
- 
+
   // Match the request
-  if (request.indexOf("/LED=999") != -1) {
-    bLEDsOn=false;
+  if (request.indexOf("/LED=254") != -1) {
+    if (iLEDstatus == 2) {
+      iLEDstatus = 1;
+    } else {
+      iLEDstatus = 2;
+    }
+  } else if (request.indexOf("/LED=255") != -1 || request.indexOf("/LED=254") != -1) {
+    iLEDstatus = 0;
   }else{
     if (request.indexOf("/LED=") != -1) {
-      bLEDsOn=true;
+      iLEDstatus=1;
       iModePrevious = iMode;
       iMode = request.substring(request.indexOf("/LED=")+5, request.indexOf(" HTTP")).toInt();
       bFirstTimeRound = true;
@@ -506,8 +609,8 @@ void doWeb() {
   client.println("}");
   client.println("@media only screen and (min-width: 650px) {");
   client.println("  #list li {");
-//  client.println("    float: left; width: 48%;");
-  client.println("    float: left; width: 98%;");
+  client.println("    float: left; width: 48%;");
+//  client.println("    float: left; width: 98%;");
   client.println("  }");
   client.println("}");
   client.println("#list li a {");
@@ -532,41 +635,54 @@ void doWeb() {
   client.println("  <body>");
   client.println("    <ul id=\"list\">");
   client.println("      <p align=center>-~=#X ----- Patterns ----- X#=~-</p>"); // <========================================================== dodgy carl code!
-  client.println("      <li><a href='LED=0'>Slow Cycle</a></li>");
-  client.println("      <li><a href='LED=1'>Twin Cascade</a></li>");
-  client.println("      <li><a href='LED=5'>Sparkle</a></li>");
-//  client.println("      <li><a href='LED=9'>All White (subtle twinkle)</a></li>");
-  client.println("      <li><a href='LED=17'>Fire</a></li>");
-  client.println("      <li><a href='LED=16'>Water</a></li>");
-//  client.println("      <li><a href='LED=18'>Mark Kriegsman&lsquo;s TwinkleFOX</a></li>");
-  client.println("      <li><a href='LED=18'>TwinkleFOX</a></li>");
-  client.println("      <p align=center>-~=#X ----- Effects ----- X#=~-</p>"); // <========================================================== dodgy carl code!
-  client.println("      <li><a href='LED=2'>Santa&lsquo;s Hat</a></li>");
-  client.println("      <li><a href='LED=3'>Lightning</a></li>");
-  client.println("      <li><a href='LED=4'>Twinkle, Twinkle Little Star</a></li>");
-  client.println("      <li><a href='LED=999'>Fade &lsquo;em out</a></li>");
+//  client.println("      <li><a href='LED=99'>Still</a></li>");
+  client.println("      <li><a href='LED=" + String(O_Still) + "'>Still</a></li>");
+  client.println("      <li><a href='LED=" + String(O_SlowCycle) + "'>Slow Cycle</a></li>");
+  client.println("      <li><a href='LED=" + String(O_TwinkleFOX) + "'>TwinkleFOX</a></li>");
+  client.println("      <li><a href='LED=" + String(O_Sparkle) + "'>Sparkle</a></li>");
+  client.println("      <li><a href='LED=" + String(O_Cascade) + "'>Cascade</a></li>");
+  client.println("      <li><a href='LED=" + String(O_TwinCascade) + "'>Twin Cascade</a></li>");
+  client.println("      <li><a href='LED=" + String(O_FireWater) + "'>Fire / Water</a></li>");
+  client.println("      <li><a href='LED=0'>-</a></li>");
+  client.println("      <p align=center>-~=#X ----- Specials ----- X#=~-</p>"); // <========================================================== dodgy carl code!
+  client.println("      <li><a href='LED=" + String(O_Fire) + "'>Fire</a></li>");
+  client.println("      <li><a href='LED=" + String(O_Water) + "'>Water</a></li>");
+  client.println("      <li><a href='LED=" + String(O_SantaHat) + "'>Santa&lsquo;s Hat</a></li>");
+  client.println("      <li><a href='LED=" + String(O_Lightning) + "'>Lightning</a></li>");
+  client.println("      <li><a href='LED=" + String(O_TwinkleStar) + "'>Twinkle, Twinkle Little Star</a></li>");
+  client.println("      <li><a href='LED=" + String(O_SparkleStar) + "'>Sparkle Stars</a></li>");
+  client.println("      <li><a href='LED=" + String(O_Police) + "'>Stop - Police!</a></li>");
+  client.println("      <li><a href='LED=12'>Classic</a></li>");
+//  client.println("      <li><a href='LED=0'>-</a></li>");
+  client.println("      <li><a href='LED=254'>Pause / Play</a></li>");
+  client.println("      <li><a href='LED=255'>Fade &lsquo;em out</a></li>");
   client.println("      <p align=center>-~=#X ----- Colour Schemes ----- X#=~-</p>"); // <========================================================== dodgy carl code!
-  client.println("      <li><a href='LED=20'>TwinkleFOX fairy</a></li>");
-  client.println("      <li><a href='LED=21'>CloudColors</a></li>");
   client.println("      <li><a href='LED=22'>RainbowColors</a></li>");
-  client.println("      <li><a href='LED=23'>LavaColors</a></li>");
-  client.println("      <li><a href='LED=24'>OceanColors</a></li>");
-  client.println("      <li><a href='LED=25'>ForestColors</a></li>");
   client.println("      <li><a href='LED=26'>RainbowStripeColors</a></li>");
   client.println("      <li><a href='LED=27'>PartyColors</a></li>");
-  client.println("      <li><a href='LED=28'>WhiteGold</a></li>");
-  client.println("      <li><a href='LED=29'>Fire</a></li>");
-  client.println("      <li><a href='LED=30'>Water</a></li>");
-  client.println("      <li><a href='LED=31'>Blorange</a></li>");
   client.println("      <li><a href='LED=32'>Classic</a></li>");
+  client.println("      <li><a href='LED=29'>Fire</a></li>");
+  client.println("      <li><a href='LED=23'>LavaColors</a></li>");
+  client.println("      <li><a href='LED=30'>Water</a></li>");
+  client.println("      <li><a href='LED=24'>OceanColors</a></li>");
+  client.println("      <li><a href='LED=21'>CloudColors</a></li>");
+  client.println("      <li><a href='LED=25'>ForestColors</a></li>");
+  client.println("      <li><a href='LED=28'>WhiteGold</a></li>");
+  client.println("      <li><a href='LED=31'>Blorange</a></li>");
+  client.println("      <li><a href='LED=37'>Grurple</a></li>");
+  client.println("      <li><a href='LED=38'>AquaGray</a></li>");
   client.println("      <li><a href='LED=33'>Holly</a></li>");
   client.println("      <li><a href='LED=34'>RedWhite</a></li>");
   client.println("      <li><a href='LED=35'>Pastel</a></li>");
+  client.println("      <li><a href='LED=20'>TwinkleFOX fairy</a></li>");
+  client.println("      <li><a href='LED=36'>Stars</a></li>");
+  client.println("      <li><a href='LED=39'>All One Colour:</a></li>");
+//  client.println("      <li><form><input type='text' name='Hue' value='167'></form></li>"); // <========================================================== dodgy carl code!
+//  client.println("      <form><input type='text' name='Hue' value='" + iOneColHue + "'></form>"); // <========================================================== dodgy carl code!
   client.println("    </ul><br><br><br>");
   client.println("  </body>");
   client.println("</html>");
 //---------------------------------- Marvin menu -------------------------------
-
   FastLED.delay(1);
   Serial.println("Client disconnected");
   Serial.println("");
@@ -582,62 +698,98 @@ void doLEDs(){
   }
 */
 //  iMode = 25; // uncomment to test one mode
-
   switch (iMode){
-    case 0:
-//---------------------------------- Slow Cycle ------------------------------
-      byte iHue;
-      for(byte i = 0; i < iStripLength; i++){
-        //iHue = iHueMain;
-        iHue = iHueMain + i;
-        leds[i] = ColorFromPalette(gTargetPalette, iHue);
+    case O_Still:
+      EVERY_N_MILLISECONDS(100) {
+        nblendPaletteTowardPalette(gCurrentPalette, gTargetPalette, 12);
+        for (int c = 0; c< 255; c++) {
+          ledsA[int(c/2.56)] = ColorFromPalette(gCurrentPalette, c, 128, NOBLEND);
+          ledsB[int(c/2.56)] = ColorFromPalette(gCurrentPalette, c, 128, NOBLEND);
+        }
+        FastLED.show();
       }
-      FastLED.show();
-      iHueMain++; // since this is a 'byte' will keep cycling from 0 to 255
-      FastLED.delay(70);
-//---------------------------------- Slow Cycle ------------------------------
       break;
-    case 1:
-//---------------------------------- Twin Cascade ----------------------------
+    case O_SlowCycle:
+      EVERY_N_MILLISECONDS(70) {
+        nblendPaletteTowardPalette(gCurrentPalette, gTargetPalette, 12);
+        byte iHue;
+        for(byte i = 0; i < iStripLength; i++){
+          //iHue = iHueMain;
+          iHue = iHueMain + i;
+          ledsA[i] = ColorFromPalette(gCurrentPalette, iHue);
+          ledsB[i] = ColorFromPalette(gCurrentPalette, iHue);
+        }
+        FastLED.show();
+        iHueMain++; // since this is a 'byte' will keep cycling from 0 to 255
+      }
+      break;
+    case O_Cascade:
+      EVERY_N_MILLISECONDS(10) {
+        nblendPaletteTowardPalette(gCurrentPalette, gTargetPalette, 12);
+      }
       static uint8_t hue;
-      for(int i = 0; i < iStripLength/2; i++) {
-        // fade everything out
-//        leds.fadeToBlackBy(40);
-        leds.fadeToBlackBy(20);
-
-        // let's set an led value
-//        leds[i] = CHSV(hue++,255,255);
-        leds[i] = ColorFromPalette(gTargetPalette, hue++);
-    
-        // now, let's first 20 leds to the top 20 leds, 
-        leds(iStripLength/2,iStripLength-1) = leds(iStripLength/2 - 1 ,0);
+      for(int i = iStripLength; i > 0; i--) {
+        ledsA.fadeToBlackBy(8);
+        ledsA[i] = ColorFromPalette(gTargetPalette, hue++);
+        ledsB.fadeToBlackBy(8);
+        ledsB[i] = ColorFromPalette(gTargetPalette, hue++);
         FastLED.delay(33);
       }
-//---------------------------------- Twin Cascade ----------------------------
       break;
-    case 5:
-//---------------------------------- sparkle -----------------------------------
-//      static uint8_t sparkleHue;
-      leds.fadeToBlackBy(10);
-      //leds[random8(iStripLength)] = ColorFromPalette(gTargetPalette, sparkleHue++);
-      leds[random8(iStripLength)] = ColorFromPalette(gTargetPalette, random8());
-      FastLED.delay(10);
-//---------------------------------- sparkle -----------------------------------
+    case O_TwinCascade:
+      EVERY_N_MILLISECONDS(10) {
+//      EVERY_N_MILLISECONDS(33) {
+        nblendPaletteTowardPalette(gCurrentPalette, gTargetPalette, 12);
+      }
+//      static uint8_t hue;
+      for(int i = 0; i < iStripLength/2; i++) {
+        // fade everything out
+//        ledsA.fadeToBlackBy(40);
+        ledsA.fadeToBlackBy(20);
+        ledsB.fadeToBlackBy(20);
+
+        // let's set an led value
+//        ledsA[i] = CHSV(hue++,255,255);
+//        ledsA[i] = ColorFromPalette(gCurrentPalette, hue++);
+        ledsA[i] = ColorFromPalette(gTargetPalette, hue++);
+        ledsB[i] = ColorFromPalette(gTargetPalette, hue++);
+
+        // now, let's first 20 leds to the top 20 leds, 
+        ledsA(iStripLength/2,iStripLength-1) = ledsA(iStripLength/2 - 1 ,0);
+        ledsB(iStripLength/2,iStripLength-1) = ledsB(iStripLength/2 - 1 ,0);
+
+//      }
+      }
       break;
-    case 2:
-//---------------------------------- Santa's Hat -------------------------------
-      for (byte i = 0; i < iStripLength; i++) { //assumes iStripLength 100
+    case O_Sparkle:
+      EVERY_N_MILLISECONDS(10) {
+        nblendPaletteTowardPalette(gCurrentPalette, gTargetPalette, 12);
+      }
+      ledsA.fadeLightBy(10);
+      ledsA[random8(iStripLength)] = ColorFromPalette(gTargetPalette, random8());
+      ledsB.fadeLightBy(10);
+      ledsB[random8(iStripLength)] = ColorFromPalette(gTargetPalette, random8());
+      //ledsA[random8(iStripLength)] = ColorFromPalette(gCurrentPalette, random8());
+      FastLED.delay(5);
+      break;
+    case O_SparkleStar:
+      gTargetPalette = Stars_p;
+      gCurrentPalette = Stars_p;
+      iMode = O_Sparkle;
+      break;
+    case O_SantaHat:
+      for (byte i = 0; i < iStripLength; i++) { // if iStripLength > 255 change to int
         if (i < 40 || i > 90){
-          leds[i] = CRGB::White;
-        }else{
-          leds[i] = CRGB::Red;
+          ledsA[i] = CRGB::White;
+          ledsB[i] = CRGB::White;
+
+          ledsA[i] = CRGB::Red;
+          ledsB[i] = CRGB::Red;
         }
       }
       FastLED.show();
-//---------------------------------- Santa's Hat -------------------------------
       break;
-    case 3:
-//---------------------------------- lightning ---------------------------------
+    case O_Lightning:
       if(bFirstTimeRound){
         FastLED.clear();
       }
@@ -647,40 +799,61 @@ void doLEDs(){
       for (int flashCounter = 0; flashCounter < random8(3,flashes); flashCounter++) {
         if(flashCounter == 0) dimmer = 5;     // the brightness of the leader is scaled down by a factor of 5
         else dimmer = random8(1,3);           // return strokes are brighter than the leader
-        fill_solid(leds+ledstart,ledlen,CHSV(255, 0, 255/dimmer));
+        fill_solid(ledsA+ledstart,ledlen,CHSV(255, 0, 255/dimmer));
+        fill_solid(ledsB+ledstart,ledlen,CHSV(255, 0, 255/dimmer));
         FastLED.show();                       // Show a section of LED's
         delay(random8(4,10));                 // each flash only lasts 4-10 milliseconds
-        fill_solid(leds+ledstart,ledlen,CHSV(255,0,0));   // Clear the section of LED's
+        fill_solid(ledsA+ledstart,ledlen,CHSV(255,0,0));   // Clear the section of LED's
+        fill_solid(ledsB+ledstart,ledlen,CHSV(255,0,0));   // Clear the section of LED's
         FastLED.show();     
         if (flashCounter == 0) delay (150);   // longer delay until next flash after the leader
         delay(50+random8(100));               // shorter delay between strokes  
       } // for()
       delay(random8(frequency)*100);          // delay between strikes
-//---------------------------------- lightning ---------------------------------
       break;
-    case 4:
-//---------------------------------- Twinkle, Twinkle Little Star --------------
+    case O_TwinkleStar:
       for(int i = 0; i < iStripLength; i++) {   
-        leds[i] = CRGB(2, 1, 4);
-        FastLED.delay(10);
-        //leds[iStripLength-1] = CHSV(0, 0, 255); // top star
-        leds[iStripLength-1] = CHSV(0, 0, random8(223,255)); // top star
-  
-        leds[int(iStripLength/3)] = CHSV(0, 0, random8(16,80));
-        leds[int((iStripLength/3)*2)] = CHSV(0, 0, random8(16,80));
-        leds[int(iStripLength/7)] = CHSV(0, 0, random8(16,80));
-        leds[int((iStripLength/7)*4)] = CHSV(0, 0, random8(16,80));
-        leds[int((iStripLength/7)*5)] = CHSV(0, 0, random8(16,80));
-        leds[int((iStripLength/7)*6)] = CHSV(0, 0, random8(16,80));
+        ledsA[i] = CRGB(2, 1, 4);
+        ledsB[i] = CRGB(2, 1, 4);
+        EVERY_N_MILLISECONDS(10) {
+          //ledsA[iStripLength-1] = CHSV(0, 0, 255); // top star
+          ledsA[iStripLength-1] = CHSV(0, 0, random8(223,255)); // top star
+          ledsB[iStripLength-1] = CHSV(0, 0, random8(223,255)); // top star
+    
+          ledsA[int(iStripLength/3)] = CHSV(0, 0, random8(16,80));
+          ledsA[int((iStripLength/3)*2)] = CHSV(0, 0, random8(16,80));
+          ledsA[int(iStripLength/7)] = CHSV(0, 0, random8(16,80));
+          ledsA[int((iStripLength/7)*4)] = CHSV(0, 0, random8(16,80));
+          ledsA[int((iStripLength/7)*5)] = CHSV(0, 0, random8(16,80));
+          ledsA[int((iStripLength/7)*6)] = CHSV(0, 0, random8(16,80));
+
+          ledsB[int(iStripLength/3)] = CHSV(0, 0, random8(16,80));
+          ledsB[int((iStripLength/3)*2)] = CHSV(0, 0, random8(16,80));
+          ledsB[int(iStripLength/7)] = CHSV(0, 0, random8(16,80));
+          ledsB[int((iStripLength/7)*4)] = CHSV(0, 0, random8(16,80));
+          ledsB[int((iStripLength/7)*5)] = CHSV(0, 0, random8(16,80));
+          ledsB[int((iStripLength/7)*6)] = CHSV(0, 0, random8(16,80));
+          FastLED.show();
+        }
+      }
+      break;
+    case O_Police:
+      EVERY_N_MILLISECONDS(37) {
+        for(byte i = iStripLength/3; i < (iStripLength/3)*2; i++) {
+          ledsA[i] = CRGB(255*iFlipRed, 0, 0);
+          ledsB[i] = CRGB(255*iFlipRed, 0, 0);
+        }
+        iFlipRed = 1 - iFlipRed;
         FastLED.show();
       }
-//---------------------------------- Twinkle, Twinkle Little Star --------------
-      break;
-    case 6:
-//      whiteOverRainbow(20,75,5);
-      for(int i = 0; i < iStripLength; i++) {   
-//        leds[i] = CHSV(sin8(i), 255, 255);
-        leds[i] = CHSV(i, 255, 255);
+      EVERY_N_MILLISECONDS(330) {
+        for(byte i = 0; i < iStripLength/2; i++) {
+          ledsA[i] = CRGB(0, 0, 255*iFlipBlue);
+          ledsA[iStripLength - i] = CRGB(0, 0, 255-(255*iFlipBlue));
+          ledsB[i] = CRGB(0, 0, 255*iFlipBlue);
+          ledsB[iStripLength - i] = CRGB(0, 0, 255-(255*iFlipBlue));
+        }
+        iFlipBlue = 1 - iFlipBlue;
         FastLED.show();
       }
       break;
@@ -693,13 +866,6 @@ void doLEDs(){
       oneAllOtherCascade( CRGB(0, 0, 255),  CRGB(0, 255, 0));
       break;
     case 9:
-//---------------------------------- All White (subtle twinkle)-----------------
-      for(int i = 0; i < iStripLength; i++) {   
-        leds[i] = CRGB(255, 255, 255);
-        FastLED.delay(10);
-        FastLED.show();
-      }
-//---------------------------------- All White (subtle twinkle)-----------------
       break;
     case 10:
       RGBoverlaid();
@@ -707,7 +873,16 @@ void doLEDs(){
     case 11:
       break;
     case 12:
-//      simpleCycle();
+      //classicCycle();
+      EVERY_N_MILLISECONDS(100) {
+        int iCounter;
+      
+        for(iCounter=1; iCounter<=255; iCounter++) {
+          setRYGB(iCounter);
+          FastLED.delay(30);
+          iYB = 1 - iYB;
+        }
+      }
       break;
     case 13:
       theaterChaseRainbow(50);
@@ -715,23 +890,10 @@ void doLEDs(){
     case 14:
       rainbow(20);
       break;
-/*    case 16:
-      colorWipe(CRGB(255, 0, 0), 100); // Red
-      //colorWipe(CRGB(0, 255, 0), 75); // Green
-      //colorWipe(CRGB(0, 0, 255), 50); // Blue
-      //colorWipe(CRGB(255, 255, 255), 10); // White
-      FastLED.show();
-      break; */
-/*    case 17:
-//---------------------------------- firelight ---------------------------------
-//      byte iWheelStart = 0;
-      EVERY_N_MILLISECONDS( 10 ) {
-        leds[random8(0, iStripLength)] = CHSV(0 + random8(10, 40), 255, 255);
-        FastLED.show();
+    case O_FireWater:
+      EVERY_N_MILLISECONDS(10) {
+        nblendPaletteTowardPalette(gCurrentPalette, gTargetPalette, 12);
       }
-//---------------------------------- firelight ---------------------------------
-      break; */
-    case 15:
 //---------------------------------- Mark Kriegsman's Fire2012 -----------------
       Fire2012WithPalette(); // run simulation frame, using palette colors
       
@@ -739,16 +901,15 @@ void doLEDs(){
       FastLED.delay(1000 / FRAMES_PER_SECOND);
 //---------------------------------- Mark Kriegsman's Fire2012 -----------------
       break;
-    case 16:
-//---------------------------------- Water -------------------------------------
+    case O_Water:
       gTargetPalette = gPalWater;
+      gCurrentPalette = gPalWater;
       gReverseDirection = true;
-      iMode = 15;
-//---------------------------------- Water -------------------------------------
+      iMode = O_FireWater;
       break;
-    case 17:
-//---------------------------------- Fire --------------------------------------
+    case O_Fire:
       gTargetPalette = gPalFire;
+      gCurrentPalette = gPalFire;
       gReverseDirection = false;
       // Add entropy to random number generator; we use a lot of it.
       // random16_add_entropy( random());
@@ -765,34 +926,26 @@ void doLEDs(){
          gPalFire = CRGBPalette16( CRGB::Black, darkcolor, lightcolor, CRGB::White);
 */
     
-      iMode = 15;
-//---------------------------------- Fire --------------------------------------
+      iMode = O_FireWater;
       break;
-    case 18:
-//---------------------------------- Mark Kriegsman's TwinkleFOX ---------------
-//  EVERY_N_SECONDS( SECONDS_PER_PALETTE ) { 
-//    chooseNextColorPalette( gTargetPalette ); 
-//  }
-  
-  EVERY_N_MILLISECONDS( 10 ) {
-    nblendPaletteTowardPalette(gCurrentPalette, gTargetPalette, 12);
-  }
+    case O_TwinkleFOX:
+      EVERY_N_MILLISECONDS(10) {
+        nblendPaletteTowardPalette(gCurrentPalette, gTargetPalette, 12);
+      }
 
-  drawTwinkles( leds);
-
-  FastLED.show();
-//---------------------------------- Mark Kriegsman's TwinkleFOX ---------------
+      drawTwinkles(ledsA);
+      drawTwinkles(ledsB);
+      FastLED.show();
       break;
     case 19:
 //------------------------- Mark Kriegsman's TwinkleFOX next palette -----------
-      chooseNextColorPalette(gTargetPalette); //, 99);
-      iMode = 18;
+//      chooseNextColorPalette(gTargetPalette); //, 99);
+//      iMode = O_TwinkleFOX;
 //------------------------- Mark Kriegsman's TwinkleFOX next palette -----------
       break;
     case 20:
 //------------------------- Mark Kriegsman's TwinkleFOX fairy palette ----------
       gTargetPalette = FairyLight_p;
-//      iMode = 18;
       iMode = iModePrevious;
 //------------------------- Mark Kriegsman's TwinkleFOX fairy palette ----------
       break;
@@ -886,6 +1039,26 @@ void doLEDs(){
       iMode = iModePrevious;
 //---------------------------------- Palette Pastel ----------------------------
       break;
+    case 36:
+//---------------------------------- Palette Stars -----------------------------
+      gTargetPalette = Stars_p;
+      iMode = iModePrevious;
+//---------------------------------- Palette Stars -----------------------------
+      break;
+    case O_Grurple:
+      gTargetPalette = Grurple_p;
+      iMode = iModePrevious;
+      break;
+    case O_AquaGray:
+      gTargetPalette = AquaGray_p;
+      iMode = iModePrevious;
+      break;
+    case 39:
+//---------------------------------- All One Colour ----------------------------
+//      gTargetPalette = CHSV(iOneColHue, 255, 255);
+      iMode = iModePrevious;
+//---------------------------------- All One Colour ----------------------------
+      break;
     default:
       iMode = 0;
       break;
@@ -896,10 +1069,12 @@ void colourSet(byte iDot, uint32_t c) { // set specific dot (or if iDot = -1 all
 // =============================================================================
   if (iDot == 255){
     for(byte i = 0; i < iStripLength; i++) {
-      leds[i] = c;
+      ledsA[i] = c;
+      ledsB[i] = c;
     }
   }else{
-    leds[iDot] = c;
+    ledsA[iDot] = c;
+    ledsB[iDot] = c;
   }
   FastLED.show();
 }
@@ -914,22 +1089,16 @@ void oneAllOtherCascade(uint32_t iColAll, uint32_t iColCascade){
     colourSet(i, iColAll);
   }
 }
-/* / =============================================================================
-void simpleCycle() {
 // =============================================================================
+void classicCycle() {
+// =============================================================================
+//  EVERY_N_MILLISECONDS(100) {
   int iCounter;
 
   for(iCounter=1; iCounter<=255; iCounter++) {
     setRYGB(iCounter);
-    //FastLED.delay(30);
-    }
-    iYB = 1 - iYB;
-  }
-  for(iCounter=254; iCounter>=0; iCounter--) {
-    setRYGB(iCounter);
-    //FastLED.delay(30);
-    }
-    iRG = 1 - iRG;
+    FastLED.delay(30);
+//    iYB = 1 - iYB;
   }
 }
 // =============================================================================
@@ -942,29 +1111,33 @@ void setRYGB(int iCounter) {
   for (i=0; i<=iStripLength; i++) {
     switch (i % 4){
       case 0:
-        if (iRG == 1){
-          leds[i] = CRGB(iCounter, 0, 0);
-        }
+//        if (iRG == 1){
+//          ledsA[i] = CRGB(iCounter, 0, 0);
+//        }
+        ledsA[i] = CRGB::Red;
         break;
       case 1:
-        if (iYB == 1){
-          leds[i] = CRGB(iCounter, iCounter, 0);
-        }
+//        if (iYB == 1){
+//          ledsA[i] = CRGB(iCounter, iCounter, 0);
+//        }
+        ledsA[i] = CRGB::Gold;
         break;
       case 2:
-        if (iRG == 0){
-          leds[i] = CRGB(0, 255 - iCounter, 0);
-        }
+//        if (iRG == 0){
+//          ledsA[i] = CRGB(0, 255 - iCounter, 0);
+//        }
+        ledsA[i] = CRGB::Green;
         break;
       case 3:
-        if (iYB == 0){
-          leds[i] = CRGB(0, 0, iCounter);
-        }
+//        if (iYB == 0){
+//          ledsA[i] = CRGB(0, 0, iCounter);
+//        }
+        ledsA[i] = CRGB::Blue;
         break;
     }
     FastLED.show();
   }
-} */
+}
 // =============================================================================
 void RGBoverlaid() {
 // =============================================================================
@@ -973,14 +1146,14 @@ void RGBoverlaid() {
   static byte iGstart=iBand;
   static byte iBstart=iBand*2;
     for(byte i=0; i<=iBand; i++) {
-      leds[iRstart] -= CRGB::Red;
-      leds[iGstart] -= CRGB::Green;
-      leds[iBstart] -= CRGB::Blue;
-      leds[i+iRstart] += CRGB::Red;
-      leds[i+iGstart] += CRGB::Green;
-      leds[i+iBstart] += CRGB::Blue;
+      ledsA[iRstart] -= CRGB::Red;
+      ledsA[iGstart] -= CRGB::Green;
+      ledsA[iBstart] -= CRGB::Blue;
+      ledsA[i+iRstart] += CRGB::Red;
+      ledsA[i+iGstart] += CRGB::Green;
+      ledsA[i+iBstart] += CRGB::Blue;
     }
-//    leds[iRstart] += CRGB::Red;
+//    ledsA[iRstart] += CRGB::Red;
     FastLED.show();
     FastLED.delay(300);
     iRstart += 1;
@@ -1015,7 +1188,7 @@ void rainbowFade2White(byte iDelay, byte rainbowLoops, byte whiteLoops) {
         greenVal = green(wheelVal) * float(fadeVal/fadeMax);
         blueVal = blue(wheelVal) * float(fadeVal/fadeMax);
 
-        leds[i] = CRGB( redVal, greenVal, blueVal);
+        ledsA[i] = CRGB( redVal, greenVal, blueVal);
       }
 
       //First loop, fade in!
@@ -1036,7 +1209,7 @@ void rainbowFade2White(byte iDelay, byte rainbowLoops, byte whiteLoops) {
   for(byte k = 0 ; k < whiteLoops ; k ++){
     for(byte j = 0; j < 256 ; j++){
       for(byte i=0; i < iStripLength; i++) {
-        leds[i] = CRGB(128, 128, 128);
+        ledsA[i] = CRGB(128, 128, 128);
       }
       FastLED.show();
     }
@@ -1044,7 +1217,7 @@ void rainbowFade2White(byte iDelay, byte rainbowLoops, byte whiteLoops) {
     FastLED.delay(2000);
     for(byte j = 255; j >= 0 ; j--){
       for(byte i=0; i < iStripLength; i++) {
-        leds[i] = CRGB(128, 128, 128);
+        ledsA[i] = CRGB(128, 128, 128);
       }
       FastLED.show();
     }
@@ -1068,10 +1241,10 @@ void whiteOverRainbow(byte iDelay, byte whiteSpeed, byte whiteLength ) {
     for(byte j=0; j!=255; j++) {
       for(byte i=0; i<iStripLength; i++) {
         if((i >= tail && i <= head) || (tail > head && i >= tail) || (tail > head && i <= head) ){
-          leds[i] = CRGB(255, 255, 255);
+          ledsA[i] = CRGB(255, 255, 255);
         }
         else{
-          leds[i] = Wheel(((i * 256 / iStripLength) + j) & 255);
+          ledsA[i] = Wheel(((i * 256 / iStripLength) + j) & 255);
         }        
       }
 
@@ -1100,7 +1273,7 @@ void rainbowCycle(byte iDelay) { // Slightly different, this makes the rainbow e
 
   for(j=0; j<=256 * 5; j++) { // 5 cycles of all colors on wheel
     for(i=0; i< iStripLength; i++) {
-      leds[i] = Wheel(((i * 256 / iStripLength) + j) & 255);
+      ledsA[i] = Wheel(((i * 256 / iStripLength) + j) & 255);
     }
     FastLED.show();
     FastLED.delay(iDelay);
@@ -1113,7 +1286,7 @@ void rainbow(byte iDelay) {
 
   for(j=0; j < 256; j++) {
     for(i=0; i < iStripLength; i++) {
-      leds[i] = Wheel((i+j) & 255);
+      ledsA[i] = Wheel((i+j) & 255);
     }
     FastLED.show();
     FastLED.delay(iDelay);
@@ -1125,14 +1298,14 @@ void theaterChase(uint32_t c, uint8_t iDelay) { //Theatre-style crawling lights.
   for (int j=0; j<10; j++) {  //do 10 cycles of chasing
     for (int q=0; q < 3; q++) {
       for (uint16_t i=0; i < iStripLength; i=i+3) {
-        leds[i+q] = c;    //turn every third pixel on
+        ledsA[i+q] = c;    //turn every third pixel on
       }
       FastLED.show();
 
       FastLED.delay(iDelay);
 
       for (uint16_t i=0; i < iStripLength; i=i+3) {
-        leds[i+q] = 0;        //turn every third pixel off
+        ledsA[i+q] = 0;        //turn every third pixel off
       }
     }
   }
@@ -1143,14 +1316,14 @@ void theaterChaseRainbow(uint8_t iDelay) { //Theatre-style crawling lights with 
   for (int j=0; j < 256; j++) {     // cycle all 256 colors in the wheel
     for (int q=0; q < 3; q++) {
       for (uint16_t i=0; i < iStripLength; i=i+3) {
-        leds[i+q] = Wheel((i+j) % 255);    //turn every third pixel on
+        ledsA[i+q] = Wheel((i+j) % 255);    //turn every third pixel on
       }
       FastLED.show();
 
       FastLED.delay(iDelay);
 
       for (uint16_t i=0; i < iStripLength; i=i+3) {
-        leds[i+q] = 0;        //turn every third pixel off
+        ledsA[i+q] = 0;        //turn every third pixel off
       }
     }
   }
@@ -1257,17 +1430,18 @@ void Fire2012WithPalette()
       byte colorindex = scale8( heat[j], 240);
       int pixelnumber;
 
-      CRGB color = ColorFromPalette( gTargetPalette, colorindex);
+//      CRGB color = ColorFromPalette(gTargetPalette, colorindex);
+      CRGB color = ColorFromPalette(gCurrentPalette, colorindex);
       if( gReverseDirection ) {
 //        CRGB color = ColorFromPalette( gPalWater, colorindex);
         pixelnumber = (iStripLength-1) - j;
-        leds[pixelnumber] = color;
+        ledsA[pixelnumber] = color;
       } else {
 //        CRGB color = ColorFromPalette( gPalFire, colorindex);
         pixelnumber = j;
-        leds[pixelnumber] = color;
+        ledsA[pixelnumber] = color;
       }
-//      leds[pixelnumber] = color;
+//      ledsA[pixelnumber] = color;
     }
 }
 
@@ -1411,7 +1585,7 @@ void coolLikeIncandescent( CRGB& c, uint8_t phase)
   c.b = qsub8( c.b, cooling * 2);
 }
 
-
+/*
 // A mostly red palette with green accents and white trim.
 // "CRGB::Gray" is used as white to keep the brightness more uniform.
 const TProgmemRGBPalette16 RedGreenWhite_p FL_PROGMEM =
@@ -1492,4 +1666,5 @@ void chooseNextColorPalette( CRGBPalette16& pal) //, byte iPal)
 //    pal = *(ActivePaletteList[iPal]);
 //  }
 }
+*/
 
