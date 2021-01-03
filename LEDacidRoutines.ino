@@ -77,10 +77,10 @@ void classicCycle(){
     iBright--;
   }
 //  Serial.println(iBright);
-
-  setRYGB(iBulbA, iBright);
-  setRYGB(iBulbB, 255-iBright);
-
+  for (byte i=0; i < iStripLength; i += 4){
+    setRYGB(i + iBulbA, iBright);
+    setRYGB(i + iBulbB, 255-iBright);
+  }
   FastLED.show();
 }
 // =============================================================================
@@ -304,6 +304,10 @@ void doLEDs(){
       }
       break;
     case O_Classic:
+      if(bFirstTimeRound){
+        FastLED.clear();
+      }
+
       classicCycle();
       break;
     case O_SantaHat:
