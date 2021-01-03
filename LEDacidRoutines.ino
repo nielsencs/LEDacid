@@ -49,49 +49,56 @@ void setTopStar(){
 // =============================================================================
 void classicCycle(){
 // =============================================================================
-//  EVERY_N_MILLISECONDS(100) {
-    byte i;
-    byte j;
+//  byte i;
+//  byte j;
+  static iBright = 255;
+  static iBulbA = 0;
+  static iBulbB = 1;
 
-//    if(iYB==0){
-      for(j=0; j<255; j++) {
-        for(i=0; i<iStripLength; i++) {
-          setRYGB(i,j);
-  //            FastLED.delay(30);
-        }
-        FastLED.show();
-      }
-//    } else{
-//      for(j=255; j>0; j--) {
-//        for(i=0; i<iStripLength; i++) {
-//          setRYGB(i,j);
-  //            FastLED.delay(30);
-//        }
-//        FastLED.show();
-//      }    
-//    }
-//    iYB = 1 - iYB;
-//  }
+  if (iBright == 255){
+    iBulbA++
+    if(iBulbA == 4){
+      iBulbA = 0;
+    }
+    iUp=0;
+  }
+
+  if (iBright == 0){
+    iBulbB++
+    if(iBulbB == 4){
+      iBulbB = 0;
+    }
+    iUp=1;
+  }
+
+  if(iUp == 1){ // we're brightening!
+    iBright++;    
+  } else{
+    iBright--;
+  }
+
+  setRYGB(iBulbA, iBright)
+  setRYGB(iBulbB, 255-iBright)
 }
 // =============================================================================
-void setRYGB(byte i, byte j){
+void setRYGB(byte iBulb, byte iBright){ // splits the led strips into RYGB
 // =============================================================================
   switch (i%4){
     case 0: // Red
-      ledsA[i] = CRGB(255, 0, 0);
-      ledsB[i] = CRGB(255, 0, 0);
+      ledsA[iBulb] = CRGB(iBright, 0, 0);
+      ledsB[iBulb] = CRGB(iBright, 0, 0);
       break;
     case 1: // Yellow (Gold)
-      ledsA[i] = CRGB(255, 255, 0);
-      ledsB[i] = CRGB(255, 255, 0);
+      ledsA[iBulb] = CRGB(iBright, iBright, 0);
+      ledsB[iBulb] = CRGB(iBright, iBright, 0);
       break;
     case 2: // Green
-      ledsA[i] = CRGB(0, 255, 0);
-      ledsB[i] = CRGB(0, 255, 0);
+      ledsA[iBulb] = CRGB(0, iBright, 0);
+      ledsB[iBulb] = CRGB(0, iBright, 0);
       break;
     case 3: // Blue
-      ledsA[i] = CRGB(0, 0, 255);
-      ledsB[i] = CRGB(0, 0, 255);
+      ledsA[iBulb] = CRGB(0, 0, iBright);
+      ledsB[iBulb] = CRGB(0, 0, iBright);
       break;
   }
 }
@@ -587,4 +594,3 @@ void Fire2012WithPalette()
     }
 }
 // ---------------------------------- Mark Kriegsman's Fire2012 ----------------------------------
-

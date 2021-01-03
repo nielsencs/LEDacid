@@ -180,7 +180,7 @@ void loop()
       EVERY_N_MILLISECONDS(14) {
         nblendPaletteTowardPalette(gCurrentPalette, gTargetPalette, maxChanges);
       }
-      doLEDs();
+      doLEDs(); //in LEDacidRoutines
     }
     bFirstTimeRound = false;
   }else{
@@ -268,4 +268,3 @@ void juggle(){
     dothue += 32;
   }
 }
-
