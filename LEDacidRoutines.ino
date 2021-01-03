@@ -55,20 +55,20 @@ void classicCycle(){
   static byte iBulbA = 0;
   static byte iBulbB = 1;
 
-  if (iBright == 255){
-    iBulbA++;
+  if (iBright == 0){
+    iBulbA+=2;
     if(iBulbA == 4){
       iBulbA = 0;
     }
-    iUp=0;
+    iUp=1;
   }
 
-  if (iBright == 0){
-    iBulbB++;
-    if(iBulbB == 4){
-      iBulbB = 0;
+  if (iBright == 255){
+    iBulbB+=2;
+    if(iBulbB == 5){
+      iBulbB = 1;
     }
-    iUp=1;
+    iUp=0;
   }
 
   if(iUp == 1){ // we're brightening!
@@ -76,9 +76,12 @@ void classicCycle(){
   } else{
     iBright--;
   }
+//  Serial.println(iBright);
 
   setRYGB(iBulbA, iBright);
   setRYGB(iBulbB, 255-iBright);
+
+  FastLED.show();
 }
 // =============================================================================
 void setRYGB(byte iBulb, byte iBright){ // splits the led strips into RYGB
