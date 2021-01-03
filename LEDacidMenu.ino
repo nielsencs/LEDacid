@@ -117,7 +117,7 @@ void doWeb() {
   client.println("      <li><a href='LED=" + String(O_TwinkleStar) +            "'>Twinkle, Twinkle Little Star</a></li>");
 
   client.println("      <li><a href='LED=" + String(O_SparkleBlorange) +        "'>Sparkle Blorange</a></li>");
-//  client.println("      <li><a href='LED=" + String(O_Classic) +                "'>Classic</a></li>");
+  client.println("      <li><a href='LED=" + String(O_Classic) +                "'>Classic</a></li>");
   client.println("      <li><a href='LED=" + String(O_SlowCycle) +              "'>-</a></li>");
   client.println("      <li><a href='LED=" + String(O_SlowCycle) +              "'>-</a></li>");
 
@@ -203,4 +203,3 @@ void doWeb() {
   Serial.println("Client disconnected");
   Serial.println("");
 }
-
