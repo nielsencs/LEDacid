@@ -51,12 +51,12 @@ void classicCycle(){
 // =============================================================================
 //  byte i;
 //  byte j;
-  static iBright = 255;
-  static iBulbA = 0;
-  static iBulbB = 1;
+  static byte iBright = 255;
+  static byte iBulbA = 0;
+  static byte iBulbB = 1;
 
   if (iBright == 255){
-    iBulbA++
+    iBulbA++;
     if(iBulbA == 4){
       iBulbA = 0;
     }
@@ -64,7 +64,7 @@ void classicCycle(){
   }
 
   if (iBright == 0){
-    iBulbB++
+    iBulbB++;
     if(iBulbB == 4){
       iBulbB = 0;
     }
@@ -77,13 +77,13 @@ void classicCycle(){
     iBright--;
   }
 
-  setRYGB(iBulbA, iBright)
-  setRYGB(iBulbB, 255-iBright)
+  setRYGB(iBulbA, iBright);
+  setRYGB(iBulbB, 255-iBright);
 }
 // =============================================================================
 void setRYGB(byte iBulb, byte iBright){ // splits the led strips into RYGB
 // =============================================================================
-  switch (i%4){
+  switch (iBulb%4){
     case 0: // Red
       ledsA[iBulb] = CRGB(iBright, 0, 0);
       ledsB[iBulb] = CRGB(iBright, 0, 0);
