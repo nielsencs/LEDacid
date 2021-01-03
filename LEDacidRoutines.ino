@@ -80,8 +80,32 @@ void classicCycle(){
   for (byte i=0; i < iStripLength; i += 4){
     setRYGB(i + iBulbA, iBright);
     setRYGB(i + iBulbB, 255-iBright);
+//    setClassic(i + iBulbA, iBright);
+//    setClassic(i + iBulbB, 255-iBright);
   }
   FastLED.show();
+}
+// =============================================================================
+void setClassic(byte iBulb, byte iBright){ 
+// =============================================================================
+  switch (iBulb%4){
+    case 0: // Red
+      ledsA[iBulb] = ColorFromPalette( gCurrentPalette, iBulb, iBright, NOBLEND);
+      ledsB[iBulb] = ColorFromPalette( gCurrentPalette, iBulb, iBright, NOBLEND);
+      break;
+    case 1: // Yellow (Gold)
+      ledsA[iBulb] = ColorFromPalette( gCurrentPalette, iBulb+1, iBright, NOBLEND);
+      ledsB[iBulb] = ColorFromPalette( gCurrentPalette, iBulb+1, iBright, NOBLEND);
+      break;
+    case 2: // Green
+      ledsA[iBulb] = ColorFromPalette( gCurrentPalette, iBulb+2, iBright, NOBLEND);
+      ledsB[iBulb] = ColorFromPalette( gCurrentPalette, iBulb+2, iBright, NOBLEND);
+      break;
+    case 3: // Blue
+      ledsA[iBulb] = ColorFromPalette( gCurrentPalette, iBulb+3, iBright, NOBLEND);
+      ledsB[iBulb] = ColorFromPalette( gCurrentPalette, iBulb+3, iBright, NOBLEND);
+      break;
+  }
 }
 // =============================================================================
 void setRYGB(byte iBulb, byte iBright){ // splits the led strips into RYGB

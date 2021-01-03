@@ -119,8 +119,7 @@ void doWeb() {
   client.println("      <li><a href='LED=" + String(O_SparkleBlorange) +        "'>Sparkle Blorange</a></li>");
   client.println("      <li><a href='LED=" + String(O_Classic) +                "'>Classic</a></li>");
   client.println("      <li><a href='LED=" + String(O_SlowCycle) +              "'>-</a></li>");
-  client.println("      <li><a href='LED=" + String(O_SlowCycle) +              "'>-</a></li>");
-
+  
   client.println("      <p align=center>-~=#X ----- Patterns ----- X#=~-</p>"); // <=================================== dodgy carl code!
   client.println("      <li><a href='LED=" + String(O_Still) +                  "'>Still</a></li>");
   client.println("      <li><a href='LED=" + String(O_FadePalette) +            "'>Fade Palette</a></li>");
