@@ -1,0 +1,274 @@
+<!--
+HTTP/1.1 200 OK
+Content-Type: text/html
+
+<!DOCTYPE html>
+-->
+<html>
+  <head>
+    <meta charset=\"UTF-8\">
+    <title>LEDacid Menu</title>
+  </head>
+  <body>
+    <div class="boxSectionOut">
+      <h2>Controls</h2>
+      <div class="boxSectionIn">
+      <ul id="list">
+        <li><a href='LED=" + String(O_PausePlay) + "'>Play/Pause</a></li>
+        <li><a href='LED=" + String(O_FadeOut) + "'>Fade &lsquo;em up/out</a></li>
+        <!-- client print("<li><a href='LED=" + String(O_CyclePalettes) + "'>if (bCyclePalettes){client.print("Don&rsquo;t }client.println("Cycle Palettes</a></li> -->
+      </ul>
+
+<label for='topStar'> Shine top star</label>
+<input type='checkbox' id='topStar' name='topStar'>
+    </div>
+    </div>
+
+    <div class="boxSectionOut">
+      <h2>Routines</h2>
+      <div class="boxSectionIn">
+<form>
+    <label for="routines">Routine:</label>
+    <select name="routines" id="routines" onchange="alert()">
+      <option value="1">Twinkle Fairy</option>
+      <option value="2" selected>Rainbow Slow Cycle</option>
+      <option value="3">WhiteGold Sparkle</option>
+      <option value="4">Twinkle Holly</option>
+      <option value="5">Rainbow Trickle</option>
+      <option value="6">Sparkle Stars</option>
+      <option value="7">It&rsquo;s Snowing!</option>
+      <option value="8">Rainbow Cascade</option>
+      <option value="9">Twinkle, Twinkle Little Star</option>
+      <option value="10">Sparkle Blorange</option>
+      <option value="11">Classic</option>
+    </select>
+<br /> 
+ (a combination of:
+    <label for="patterns">Pattern:</label>
+    <select name="patterns" id="patterns" onchange="alert()">
+      <option value="">Still</option>
+      <option value="">Fade Palette</option>
+      <option value="" selected>Slow Cycle</option>
+      <option value="">Shuffle</option>
+      <option value="">Twinkle</option>
+      <option value="">Shimmer</option>
+      <option value="">Sparkle</option>
+      <option value="">Cascade</option>
+      <option value="">FireWater</option>
+    </select> 
+and
+    <label for="palettes">Palette:</label>
+    <select name="palettes" id="palettes" onchange="alert()">
+      <option value="" selected>RainbowColors</option>
+      <option value="">RainbowStripeColors</option>
+      <option value="">RuGBY</option>
+      <option value="">PartyColors</option>
+      <option value="">Pastel</option>
+      <option value="">Dawn</option>
+      <option value="">Fire</option>
+      <option value="">Water</option>
+      <option value="">OceanColors</option>
+      <option value="">CloudColors</option>
+      <option value="">ForestColors</option>
+      <option value="">WhitePurple</option>
+      <option value="">WhiteGold</option>
+      <option value="">Blorange</option>
+      <option value="">Aquorange</option>
+      <option value="">Grurple</option>
+      <option value="">Ruthie&rsquo;s</option>
+      <option value="">AquaGray</option>
+      <option value="">Holly</option>
+      <option value="">Fairy Lights</option>
+      <option value="">Stars</option>
+      <option value="">Santa&rsquo;s Hat</option>
+      <option value="">Monochrome</option>
+      <option value="">RetroC9</option>
+      <option value="">BlueWhite</option>
+      <option value="">RedGreenWhite</option>
+      <option value="">Snow</option>
+      <option value="">Ice</option>
+      <option value="">AllWhite</option>
+      <option value="">AllBlacks</option>
+    </select> 
+)
+<br />
+<label for='patternCycle'> Cycle Patterns</label>
+<input type='checkbox' id='patternCycle' name='patternCycle'>
+
+<label for='paletteCycle'> Cycle Palettes</label>
+<input type='checkbox' id='paletteCycle' name='paletteCycle'>
+</form>
+      </div>
+    </div>
+
+
+
+
+
+
+
+
+    <!-- ul id="list">
+      <li><a href='LED=" + String(O_TwinkleFOXClassic) +      "'>Twinkle Fairy</a></li>
+      <li><a href='LED=" + String(O_SlowCycleRainbow) +       "'>Rainbow Slow Cycle</a></li>
+      <li><a href='LED=" + String(O_SparkleWhiteGold) +       "'>WhiteGold Sparkle</a></li>
+
+      <li><a href='LED=" + String(O_TwinkleFOXHolly) +        "'>Twinkle Holly</a></li>
+      <li><a href='LED=" + String(O_SlowCycleRainbowStripe) + "'>Rainbow Trickle</a></li>
+      <li><a href='LED=" + String(O_SparkleStar) +            "'>Sparkle Stars</a></li>
+
+      <li><a href='LED=" + String(O_Snowing) +                "'>It&rsquo;s Snowing!</a></li>
+      <li><a href='LED=" + String(O_CascadeRainbow) +         "'>Rainbow Cascade</a></li>
+      <li><a href='LED=" + String(O_TwinkleStar) +            "'>Twinkle, Twinkle Little Star</a></li>
+
+      <li><a href='LED=" + String(O_SparkleBlorange) +        "'>Sparkle Blorange</a></li>
+      <li><a href='LED=" + String(O_Classic) +                "'>Classic</a></li>
+      <li><a href='LED=" + String(O_SlowCycle) +              "'>-</a></li>
+  
+<!-- div class="boxSection">
+      <p align=center>-~=#X ----- Patterns ----- X#=~-</p> // <=================================== dodgy carl code!
+      <li><a href='LED=" + String(O_Still) +                  "'>Still</a></li>
+      <li><a href='LED=" + String(O_FadePalette) +            "'>Fade Palette</a></li>
+      <li><a href='LED=" + String(O_SlowCycle) +              "'>Slow Cycle</a></li>
+
+      <li><a href='LED=" + String(O_Shuffle) +                "'>Shuffle</a></li>
+      <li><a href='LED=" + String(O_TwinkleFOX) +             "'>Twinkle</a></li>
+      <li><a href='LED=" + String(O_Shimmer) +                "'>Shimmer</a></li>
+
+      <li><a href='LED=" + String(O_Sparkle) +            "'>Sparkle</a></li>
+      <li><a href='LED=" + String(O_Cascade) +                "'>Cascade</a></li>
+//      <li><a href='LED=" + String(O_TwinCascade) +          "'>Twin Cascade</a></li>
+      <li><a href='LED=" + String(O_FireWater) +              "'>FireWater</a></li>
+//      <li><a href='LED=" + String(O_SlowCycle) +              "'>-</a></li>
+</div>
+      <p align=center>-~=#X ----- Palettes ----- X#=~-</p> // <=================================== dodgy carl code!
+      <li><a href='LED=" + String(O_RainbowColors_p) +                       "'>RainbowColors</a></li>
+      <li><a href='LED=" + String(O_RainbowStripeColors_p) +                 "'>RainbowStripeColors</a></li>
+
+      <li><a href='LED=" + String(O_RuGBY_p) +                               "'>RuGBY</a></li>
+      <li><a href='LED=" + String(O_PartyColors_p) +                         "'>PartyColors</a></li>
+      <li><a href='LED=" + String(O_Pastel_p) +                              "'>Pastel</a></li>
+
+      <li><a href='LED=" + String(O_Dawn_p) +                                "'>Dawn</a></li>
+      <li><a href='LED=" + String(O_Fire_p) +                                "'>Fire</a></li>
+      <li><a href='LED=" + String(O_Water_p) +                               "'>Water</a></li>
+
+      <li><a href='LED=" + String(O_OceanColors_p) +                         "'>OceanColors</a></li>
+      <li><a href='LED=" + String(O_CloudColors_p) +                         "'>CloudColors</a></li>
+      <li><a href='LED=" + String(O_ForestColors_p) +                        "'>ForestColors</a></li>
+
+      <li><a href='LED=" + String(O_WhitePurple_p) +                         "'>WhitePurple</a></li>
+      <li><a href='LED=" + String(O_WhiteGold_p) +                           "'>WhiteGold</a></li>
+      <li><a href='LED=" + String(O_Blorange_p) +                            "'>Blorange</a></li>
+
+      <li><a href='LED=" + String(O_Aquorange_p) +                           "'>Aquorange</a></li>
+      <li><a href='LED=" + String(O_Grurple_p) +                             "'>Grurple</a></li>
+      <li><a href='LED=" + String(O_Ruthies_p) +                             "'>Ruthie&rsquo;s</a></li>
+
+      <li><a href='LED=" + String(O_AquaGray_p) +                            "'>AquaGray</a></li>
+      <li><a href='LED=" + String(O_Holly_p) +                               "'>Holly</a></li>
+      <li><a href='LED=" + String(O_FairyLight_p) +                          "'>Fairy Lights</a></li>
+
+      <li><a href='LED=" + String(O_Stars_p) +                               "'>Stars</a></li>
+      <li><a href='LED=" + String(O_SantaHat_p) +                            "'>Santa&rsquo;s Hat</a></li>
+      <li><a href='LED=" + String(O_Monochrome_p) +                          "'>Monochrome</a></li>
+
+      <li><a href='LED=" + String(O_RetroC9_p) +                             "'>RetroC9</a></li>
+      <li><a href='LED=" + String(O_BlueWhite_p) +                           "'>BlueWhite</a></li>
+      <li><a href='LED=" + String(O_RedGreenWhite_p) +                       "'>RedGreenWhite</a></li>
+
+      <li><a href='LED=" + String(O_Snow_p) +                                "'>Snow</a></li>
+      <li><a href='LED=" + String(O_Ice_p) +                                 "'>Ice</a></li>
+      <li><a href='LED=" + String(O_Black_p) +                               "'>AllBlacks</a></li>
+
+      <li><a href='LED=" + String(O_White_p) +                               "'>AllWhite</a></li>
+      <li><a href='LED=" + String(O_Black_p) +                               "'>AllBlacks</a></li>
+      <li><a href='LED=" + String(O_Black_p) +                               "'>AllBlacks</a></li>
+
+//      <li><a href='LED=" + String(O_OneColour) +                              "&Hue=0'>All One Colour:</a></li>
+//      <form><input type='text' name='Hue' value='" + String(iOneColHue) + "'></form> // <=================================== dodgy carl code!
+//      <input type='range' min='0' max='255' value='128' class='slider' id='iOneColHue'> // <=================================== dodgy carl code!
+//  client.println('      <form action="/get"><input type="hidden" id="LED" value="' + String(O_OneColour) + '"><input type="range" min="0" max="255" value="128" class="slider" id="OneColHue"><input type="submit" value="All One Colour"></form>');
+
+      <p align=center>-~=#X ----- Specials ----- X#=~-</p> // <=================================== dodgy carl code!
+      <li><a href='LED=" + String(O_Fire) +                   "'>Fire</a></li>
+      <li><a href='LED=" + String(O_Water) +                  "'>Water</a></li>
+      <li><a href='LED=" + String(O_SantaHat) +               "'>Santa&rsquo;s Hat</a></li>
+
+      <li><a href='LED=" + String(O_Lightning) +              "'>Lightning</a></li>
+      <li><a href='LED=" + String(O_Police) +                 "'>Stop - Police!</a></li>
+      <li><a href='LED=" + String(O_PsychOut) +               "'>Psychadelic Outrage!</a></li>
+    </ul -->
+
+    <div class="boxSectionOut">
+      <h2>Timer</h2>
+      <div class="boxSectionIn">
+        <p>Some sort of options to set on/off timer(s) e.g.  Start Time, Stop Time</p>
+      </div>
+    </div>
+  </body>
+
+
+
+
+
+
+
+<style>
+* {margin: 0; padding:0; box-sizing: border-box; font-family: 'Helvetica', Arial; font-weight: bold; font-size: large;}
+body { background-color: #302;  color: #CB7; }
+#list {
+  display: block;
+  list-style-type: none;
+  padding: 0;
+  overflow: hidden;
+}
+#list li {
+  margin: 1%;
+  margin-bottom: 10px;
+}
+@media only screen and (min-width: 650px) {
+  #list li {
+    float: left;
+    /*width: 30%;*/
+  }
+}
+
+#list li a {
+  background: #201;
+  color: #CB7;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px #735;
+  border: solid 1px #735;
+  display: block;
+  padding: 10px;
+  text-align: center;
+  text-decoration: none;
+}
+
+#list li a:hover {
+  border: solid 1px #000;
+  color: #FE3;
+}
+
+#list li a:active {
+  background-color: #310;
+}
+
+.boxSectionOut {
+  margin: 3%;
+  border: solid 3px #CB7;
+  border-radius: 10px;
+}
+
+.boxSectionOut h2{
+  margin: 3px 0 0 14px;
+  font-size: 24px;
+}
+
+.boxSectionIn {
+  padding: 3%;
+}
+
+</style>
+</html>
