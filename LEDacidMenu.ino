@@ -42,7 +42,7 @@ void doWeb() {
       doDynamicOptions();
     }
   }
-  
+
 // -------------------------------------- Display Web Page --------------------------------------
   client.println("HTTP/1.1 200 OK");
   client.println("Content-Type: text/html");
@@ -53,48 +53,6 @@ void doWeb() {
   client.println("  <head>");
   client.println("    <meta charset=\"UTF-8\">");
   client.println("    <title>LEDacid Menu</title>");
-// ------------------------------------------- Styles -------------------------------------------
-  client.println("    <style>");
-  client.println("* {margin: 0; padding:0; box-sizing: border-box; font-family: 'Helvetica', Arial; font-weight: bold; font-size: large;}");
-  client.println("body { background-color: #302;  color: #CB7; }");
-  client.println("#list {");
-  client.println("  display: block;");
-  client.println("  list-style-type: none;");
-  client.println("  padding: 0;");
-  client.println("  overflow: hidden;");
-  client.println("}");
-  client.println("#list li {");
-  client.println("  margin: 1%;");
-  client.println("  margin-bottom: 10px;");
-  client.println("}");
-  client.println("@media only screen and (min-width: 650px) {");
-  client.println("  #list li {");
-//  client.println("    float: left; width: 98%;");
-//  client.println("    float: left; width: 48%;");
-  client.println("    float: left; width: 30%;");
-  client.println("  }");
-  client.println("}");
-// ------------------------------------------ Buttons -------------------------------------------
-  client.println("#list li a {");
-  client.println("  background: #201;");
-  client.println("  color: #CB7;");
-  client.println("  border-radius: 10px;");
-  client.println("  box-shadow: 0 3px 10px #735;");
-  client.println("  border: solid 1px #735;");
-  client.println("  display: block;");
-  client.println("  padding: 10px;");
-  client.println("  text-align: center;");
-  client.println("  text-decoration: none;");
-  client.println("}");
-  client.println("#list li a:hover {");
-  client.println("  border: solid 1px #000;");
-  client.println("  color: #FE3;");
-  client.println("}");
-  client.println("#list li a:active {");
-  client.println("  background-color: #310;");
-  client.println("}   </style>");
-// ------------------------------------------ Buttons -------------------------------------------
-// ------------------------------------------- Styles -------------------------------------------
   client.println("  </head>");
   client.println("  <body>");
   client.println("    <ul id=\"list\">");
@@ -119,7 +77,7 @@ void doWeb() {
   client.println("      <li><a href='LED=" + String(O_SparkleBlorange) +        "'>Sparkle Blorange</a></li>");
   client.println("      <li><a href='LED=" + String(O_Classic) +                "'>Classic</a></li>");
   client.println("      <li><a href='LED=" + String(O_SlowCycle) +              "'>-</a></li>");
-  
+
   client.println("      <p align=center>-~=#X ----- Patterns ----- X#=~-</p>"); // <=================================== dodgy carl code!
   client.println("      <li><a href='LED=" + String(O_Still) +                  "'>Still</a></li>");
   client.println("      <li><a href='LED=" + String(O_FadePalette) +            "'>Fade Palette</a></li>");
@@ -196,6 +154,48 @@ void doWeb() {
 
   client.println("    </ul><br><br><br>");
   client.println("  </body>");
+  // ------------------------------------------- Styles -------------------------------------------
+    client.println("    <style>");
+    client.println("* {margin: 0; padding:0; box-sizing: border-box; font-family: 'Helvetica', Arial; font-weight: bold; font-size: large;}");
+    client.println("body { background-color: #302;  color: #CB7; }");
+    client.println("#list {");
+    client.println("  display: block;");
+    client.println("  list-style-type: none;");
+    client.println("  padding: 0;");
+    client.println("  overflow: hidden;");
+    client.println("}");
+    client.println("#list li {");
+    client.println("  margin: 1%;");
+    client.println("  margin-bottom: 10px;");
+    client.println("}");
+    client.println("@media only screen and (min-width: 650px) {");
+    client.println("  #list li {");
+  //  client.println("    float: left; width: 98%;");
+  //  client.println("    float: left; width: 48%;");
+    client.println("    float: left; width: 30%;");
+    client.println("  }");
+    client.println("}");
+  // ------------------------------------------ Buttons -------------------------------------------
+    client.println("#list li a {");
+    client.println("  background: #201;");
+    client.println("  color: #CB7;");
+    client.println("  border-radius: 10px;");
+    client.println("  box-shadow: 0 3px 10px #735;");
+    client.println("  border: solid 1px #735;");
+    client.println("  display: block;");
+    client.println("  padding: 10px;");
+    client.println("  text-align: center;");
+    client.println("  text-decoration: none;");
+    client.println("}");
+    client.println("#list li a:hover {");
+    client.println("  border: solid 1px #000;");
+    client.println("  color: #FE3;");
+    client.println("}");
+    client.println("#list li a:active {");
+    client.println("  background-color: #310;");
+    client.println("}   </style>");
+  // ------------------------------------------ Buttons -------------------------------------------
+  // ------------------------------------------- Styles -------------------------------------------
   client.println("</html>");
 // --------------------------------------- Marvin's Code ----------------------------------------
   FastLED.delay(1);
