@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<style>
+  input {
+    width: 70px;
+  }
+</style>
+
+<script type="text/javascript">
+  var bMakePaletteSlots=false;
+  var atPalette = ['','','','','','','','','','','','','','','',''];
+  var iLastIndex = -1;
+  var iRange = 0;
+
+  function intToText(iInt, iChars=2){ // two character integer string with leading zeros
+    var tInt = "000000000000000" + iInt.toString();
+    tInt = tInt.substr(tInt.length-iChars, iChars);
+    return tInt;
+  }
+
+  function componentToHex(c) {
+    var hex = c.toString(16);
+    return hex.length == 1 ? "0" + hex : hex;
+  }
+
+  function rgbToHex(r, g, b) {
+    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+  }
+
+  function hexToRgb(hex) { // alert(hexToRgb("#0033ff").g); // "51";
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16)
+    } : null;
+  }
+
+  function setPalSlot(iSlot, tColour){
+    var tItem = intToText(iSlot);
+    document.forms["frmPalette"]["PalCol" + tItem].value = "#8000ff";
+  }
+
+  function getPalSlot(iSlot){
+    var tItem = intToText(iSlot);
+    return document.forms["frmPalette"]["PalCol" + tItem].value;
+  }
+
+  function setPalSlots(iStart, iEnd){
+    var iPalStart;
+    var iPalEnd;
+    for (var i = iStart+1; i < iEnd; i++) {
+      tItem = intToText(i);
+      document.forms["frmPalette"]["PalCol" + tItem].value = "#FF8833";//atPalette[i];
+    }
+  }
+
+  function makePaletteSlots(iSlot) {
+    // first pass - set string
+    var tItem = intToText(iSlot);
+    // var iCount = 0;
+    // alert (tItem);
+    if (document.forms["frmPalette"]["PalCol" + tItem].value > "#000000"){
+      // iCount++;
+      atPalette[iSlot] = document.forms["frmPalette"]["PalCol" + tItem].value;
+      document.forms["frmPalette"]["PalVal" + tItem].value = atPalette[iSlot];
+    }
+    // alert(iLastIndex);
+    if (iLastIndex > -1){
+      // alert("range");
+      if (iLastIndex > iSlot){
+        setPalSlots(iSlot, iLastIndex);
+      } else{
+        setPalSlots(iLastIndex, iSlot);
+      }
+    }
+
+    iLastIndex = iSlot;
+    //
+    // if (! bMakePaletteSlots){ // prevent recursive calls
+    //   if (iCount > 1){
+    //     for (var i = 0; i < 16; i++) { // second pass - set values and set strings
+    //       tItem = intToText(i);
+    //       if (atPalette[i] > "#000000"){
+    //         document.forms["frmPalette"]["PalCol" + tItem].value = atPalette[i];
+    //       }
+    //     }
+    //   }
+    //   for (var i = 0; i < 16; i++) { / se
+    //     tItem = intToText(i);
+    //     // alert(document.forms["frmPalette"]["PalCol"+ tItem].value);
+    //     // if (document.forms["frmPalette"]["PalCol" + tItem].value > "#000000"){
+    //     if (atPalette[i] > ''){
+    //       document.forms["frmPalette"]["PalVal" + tItem].value = document.forms["frmPalette"]["PalCol" + tItem].value;
+    //     }else{
+    //       bMakePaletteSlots=true;
+    //       document.forms["frmPalette"]["PalCol" + tItem].value = document.forms["frmPalette"]["PalCol" + tItem].value;
+    //       bMakePaletteSlots=false;
+    //     }
+    //   }
+    // }
+  }
+  function makePalette() {
+    document.frmPalette.PalVal01.value=document.frmPalette.PalCol01.value;
+    document.frmPalette.PalVal01.value=document.frmPalette.PalCol01.value;
+  }
+  function carl(){
+    aRGB = hexToRgb(getPalSlot(0));
+    alert(aRGB[0]);
+    for (var i = 1; i < 15; i++) {
+      setPalSlot(i, '#330033')
+    }
+  }
+</script>
+
+</head>
+<body>
+<form name="frmPalette" id="frmPalette" action="" method="get" onsubmit="makePalette()">
+  <table>
+    <tr>
+      <!-- <td><input type="color" name="PalCol02" name="PalCol01" value="#FF0000"></td> -->
+      <td><input type="color" name="PalCol00" id="PalCol00" onchange="makePaletteSlots(0);"></td>
+      <td><input type="color" name="PalCol01" id="PalCol01" onchange="makePaletteSlots(1);"></td>
+      <td><input type="color" name="PalCol02" id="PalCol02" onchange="makePaletteSlots(2);"></td>
+      <td><input type="color" name="PalCol03" id="PalCol03" onchange="makePaletteSlots(3);"></td>
+      <td><input type="color" name="PalCol04" id="PalCol04" onchange="makePaletteSlots(4);"></td>
+      <td><input type="color" name="PalCol05" id="PalCol05" onchange="makePaletteSlots(5);"></td>
+      <td><input type="color" name="PalCol06" id="PalCol06" onchange="makePaletteSlots(6);"></td>
+      <td><input type="color" name="PalCol07" id="PalCol07" onchange="makePaletteSlots(7);"></td>
+      <td><input type="color" name="PalCol08" id="PalCol08" onchange="makePaletteSlots(8);"></td>
+      <td><input type="color" name="PalCol09" id="PalCol09" onchange="makePaletteSlots(9);"></td>
+      <td><input type="color" name="PalCol10" id="PalCol10" onchange="makePaletteSlots(10);"></td>
+      <td><input type="color" name="PalCol11" id="PalCol11" onchange="makePaletteSlots(11);"></td>
+      <td><input type="color" name="PalCol12" id="PalCol12" onchange="makePaletteSlots(12);"></td>
+      <td><input type="color" name="PalCol13" id="PalCol13" onchange="makePaletteSlots(13);"></td>
+      <td><input type="color" name="PalCol14" id="PalCol14" onchange="makePaletteSlots(14);"></td>
+      <td><input type="color" name="PalCol15" id="PalCol15" onchange="makePaletteSlots(15);"></td>
+    </tr>
+    <tr>
+      <td><input type="text" name="PalVal01" id="PalVal00"></td>
+      <td><input type="text" name="PalVal01" id="PalVal01"></td>
+      <td><input type="text" name="PalVal02" id="PalVal02"></td>
+      <td><input type="text" name="PalVal03" id="PalVal03"></td>
+      <td><input type="text" name="PalVal04" id="PalVal04"></td>
+      <td><input type="text" name="PalVal05" id="PalVal05"></td>
+      <td><input type="text" name="PalVal06" id="PalVal06"></td>
+      <td><input type="text" name="PalVal07" id="PalVal07"></td>
+      <td><input type="text" name="PalVal08" id="PalVal08"></td>
+      <td><input type="text" name="PalVal09" id="PalVal09"></td>
+      <td><input type="text" name="PalVal10" id="PalVal10"></td>
+      <td><input type="text" name="PalVal11" id="PalVal11"></td>
+      <td><input type="text" name="PalVal12" id="PalVal12"></td>
+      <td><input type="text" name="PalVal13" id="PalVal13"></td>
+      <td><input type="text" name="PalVal14" id="PalVal14"></td>
+      <td><input type="text" name="PalVal15" id="PalVal15"></td>
+    </tr>
+  </table>
+<!-- <input type="submit"> -->
+<input type="button" onclick="setPalSlot(3, '#330033')" value="Purple">
+<input type="button" onclick="carl()" value="carl()">
+</form>
+
+</body>
+</html>
