@@ -55,11 +55,26 @@ void doWeb() {
   client.println("    <title>LEDacid Menu</title>");
   client.println("  </head>");
   client.println("  <body>");
+  client.println("    <div class='boxSectionOut'>");
+  client.println("      <h2>Controls</h2>");
+  client.println("      <div class='boxSectionIn'>");
+  client.println("        <ul id='list'>");
+  // client.println("          <li><a href='LED=" + String(O_PausePlay) + "'>Play/Pause</a></li>");
+  // client.println("          <li><a href='LED=" + String(O_FadeOut) + "'>Fade &lsquo;em up/out</a></li>");
+  client.println("          <li><a href='LED=" + String(O_PausePlay) + "'>");if (iLEDstatus == 2){client.print("Play");} else{client.print("Pause");}client.println("</a></li>");
+  client.println("          <li><a href='LED=" + String(O_FadeOut) + "'>Fade &lsquo;em ");if (iLEDstatus == 0){client.print("up");} else{client.print("out");}client.println("</a></li>");
+  client.println("        </ul>");
+  client.println("        <form>");
+  client.println("          <label for='topStar'> Shine top star</label>");
+  client.println("          <input type='checkbox' id='topStar' name='topStar' onchange='window.location.replace(\"LED=9999\");''>");
+  client.println("        </form>");
+  client.println("      </div>");
+  client.println("    </div>");
   client.println("    <ul id=\"list\">");
-//  client.println("      <p align=center>-~=#X ----- Controls ----- X#=~-</p>"); // <=================================== dodgy carl code!
-  client.print("<li><a href='LED=" + String(O_TopStar) +           "'>Top Star ");if (iTopStar>0){client.print("off");}else{client.print("on");}client.println("</a></li>");
-  client.print("<li><a href='LED=" + String(O_PausePlay) + "'>");if (iLEDstatus == 2){client.print("Play");} else{client.print("Pause");}client.println("</a></li>");
-  client.print("<li><a href='LED=" + String(O_FadeOut) + "'>Fade &lsquo;em ");if (iLEDstatus == 0){client.print("up");} else{client.print("out");}client.println("</a></li>");
+  // client.println("      <p align=center>-~=#X ----- Controls ----- X#=~-</p>"); // <=================================== dodgy carl code!
+  // client.print("<li><a href='LED=" + String(O_TopStar) +           "'>Top Star ");if (iTopStar>0){client.print("off");}else{client.print("on");}client.println("</a></li>");
+  // client.print("<li><a href='LED=" + String(O_PausePlay) + "'>");if (iLEDstatus == 2){client.print("Play");} else{client.print("Pause");}client.println("</a></li>");
+  // client.print("<li><a href='LED=" + String(O_FadeOut) + "'>Fade &lsquo;em ");if (iLEDstatus == 0){client.print("up");} else{client.print("out");}client.println("</a></li>");
 
   client.println("      <p align=center>-~=#X ----- Old Favourites ----- X#=~-</p>"); // <=================================== dodgy carl code!
   client.println("      <li><a href='LED=" + String(O_TwinkleFOXClassic) +      "'>Twinkle Fairy</a></li>");
@@ -155,7 +170,7 @@ void doWeb() {
   client.println("    </ul><br><br><br>");
   client.println("  </body>");
   // ------------------------------------------- Styles -------------------------------------------
-    client.println("    <style>");
+    client.println("<style>");
     client.println("* {margin: 0; padding:0; box-sizing: border-box; font-family: 'Helvetica', Arial; font-weight: bold; font-size: large;}");
     client.println("body { background-color: #302;  color: #CB7; }");
     client.println("#list {");
@@ -170,9 +185,7 @@ void doWeb() {
     client.println("}");
     client.println("@media only screen and (min-width: 650px) {");
     client.println("  #list li {");
-  //  client.println("    float: left; width: 98%;");
-  //  client.println("    float: left; width: 48%;");
-    client.println("    float: left; width: 30%;");
+    client.println("    float: left;");
     client.println("  }");
     client.println("}");
   // ------------------------------------------ Buttons -------------------------------------------
@@ -193,7 +206,21 @@ void doWeb() {
     client.println("}");
     client.println("#list li a:active {");
     client.println("  background-color: #310;");
-    client.println("}   </style>");
+    client.println("}");
+    client.println(".boxSectionOut {");
+    client.println("  margin: 3%;");
+    client.println("  border: solid 3px #CB7;");
+    client.println("  border-radius: 10px;");
+    client.println("}");
+    client.println(".boxSectionOut h2{");
+    client.println("  margin: 3px 0 0 14px;");
+    client.println("  font-size: 24px;");
+    client.println("}");
+    client.println(".boxSectionIn {");
+    client.println("  padding: 3%;");
+    client.println("}");
+    client.println("</style>");
+    }
   // ------------------------------------------ Buttons -------------------------------------------
   // ------------------------------------------- Styles -------------------------------------------
   client.println("</html>");
