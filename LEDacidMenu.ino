@@ -66,7 +66,9 @@ void doWeb() {
   client.println("        </ul>");
   client.println("        <form>");
   client.println("          <label for='topStar'> Shine top star</label>");
-  client.println("          <input type='checkbox' id='topStar' name='topStar' onchange='window.location.replace(\"LED=9999\");''>");
+  client.print("          <input type='checkbox' id='topStar' name='topStar' ");
+  if (iTopStar>0){client.print(" checked");}
+  client.println(" onchange='window.location.replace(\"LED=" + String(O_TopStar) + "\");''>");
   client.println("        </form>");
   client.println("      </div>");
   client.println("    </div>");
@@ -220,7 +222,6 @@ void doWeb() {
     client.println("  padding: 3%;");
     client.println("}");
     client.println("</style>");
-    }
   // ------------------------------------------ Buttons -------------------------------------------
   // ------------------------------------------- Styles -------------------------------------------
   client.println("</html>");
@@ -229,3 +230,4 @@ void doWeb() {
   Serial.println("Client disconnected");
   Serial.println("");
 }
+
