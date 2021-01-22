@@ -59,24 +59,16 @@ void doWeb() {
   client.println("      <h2>Controls</h2>");
   client.println("      <div class='boxSectionIn'>");
   client.println("        <ul id='list'>");
-  // client.println("          <li><a href='LED=" + String(O_PausePlay) + "'>Play/Pause</a></li>");
-  // client.println("          <li><a href='LED=" + String(O_FadeOut) + "'>Fade &lsquo;em up/out</a></li>");
   client.println("          <li><a href='LED=" + String(O_PausePlay) + "'>");if (iLEDstatus == 2){client.print("Play");} else{client.print("Pause");}client.println("</a></li>");
   client.println("          <li><a href='LED=" + String(O_FadeOut) + "'>Fade &lsquo;em ");if (iLEDstatus == 0){client.print("up");} else{client.print("out");}client.println("</a></li>");
   client.println("        </ul>");
   client.println("        <form>");
   client.println("          <label for='topStar'> Shine top star</label>");
-  client.print("          <input type='checkbox' id='topStar' name='topStar' ");
-  if (iTopStar>0){client.print(" checked");}
-  client.println(" onchange='window.location.replace(\"LED=" + String(O_TopStar) + "\");''>");
+  client.print("          <input type='checkbox' id='topStar' name='topStar' "); if (iTopStar>0){client.print(" checked");} client.println(" onchange='window.location.replace(\"LED=" + String(O_TopStar) + "\");''>");
   client.println("        </form>");
   client.println("      </div>");
   client.println("    </div>");
   client.println("    <ul id=\"list\">");
-  // client.println("      <p align=center>-~=#X ----- Controls ----- X#=~-</p>"); // <=================================== dodgy carl code!
-  // client.print("<li><a href='LED=" + String(O_TopStar) +           "'>Top Star ");if (iTopStar>0){client.print("off");}else{client.print("on");}client.println("</a></li>");
-  // client.print("<li><a href='LED=" + String(O_PausePlay) + "'>");if (iLEDstatus == 2){client.print("Play");} else{client.print("Pause");}client.println("</a></li>");
-  // client.print("<li><a href='LED=" + String(O_FadeOut) + "'>Fade &lsquo;em ");if (iLEDstatus == 0){client.print("up");} else{client.print("out");}client.println("</a></li>");
 
   client.println("      <p align=center>-~=#X ----- Old Favourites ----- X#=~-</p>"); // <=================================== dodgy carl code!
   client.println("      <li><a href='LED=" + String(O_TwinkleFOXClassic) +      "'>Twinkle Fairy</a></li>");
