@@ -83,6 +83,7 @@ void classicCycle(){
 //    setClassic(i + iBulbA, iBright);
 //    setClassic(i + iBulbB, 255-iBright);
   }
+  setTopStar();
   FastLED.show();
 }
 // =============================================================================
