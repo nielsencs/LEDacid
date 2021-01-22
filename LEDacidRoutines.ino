@@ -284,6 +284,7 @@ void doLEDs(){
     case O_Lightning:
       if(bFirstTimeRound){
         FastLED.clear();
+        setTopStar();
       }
 
       ledstart = random8(iStripLength-iTopStar);           // Determine starting location of flash

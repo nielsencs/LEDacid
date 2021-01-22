@@ -57,7 +57,7 @@ void doWeb() {
   client.println("    <div class='boxSectionOut'>");
   client.println("      <h2>Controls</h2>");
   client.println("      <div class='boxSectionIn'>");
-  client.println("        <ul id='list'>");
+  client.println("        <ul class='list'>");
   client.println("          <li><a href='LED=" + String(O_PausePlay) + "'>");if (iLEDstatus == 2){client.print("Play");} else{client.print("Pause");}client.println("</a></li>");
   client.println("          <li><a href='LED=" + String(O_FadeOut) + "'>Fade &lsquo;em ");if (iLEDstatus == 0){client.print("up");} else{client.print("out");}client.println("</a></li>");
   client.println("        </ul>");
@@ -67,9 +67,9 @@ void doWeb() {
   client.println("        </form>");
   client.println("      </div>");
   client.println("    </div>");
-  
+
   client.println("    <div class=\"boxSectionOut\">");
-  client.println("      <h2>Old Favourites</h2>");
+  client.println("      <h2>Routines</h2>");
   client.println("      <div class=\"boxSectionIn\">");
   client.println("        <ul class='list'>");
   client.println("      <li><a href='LED=" + String(O_TwinkleFOXClassic) +      "'>Twinkle Fairy</a></li>");
@@ -80,14 +80,11 @@ void doWeb() {
   client.println("      <li><a href='LED=" + String(O_SparkleStar) +            "'>Sparkle Stars</a></li>");
   client.println("      <li><a href='LED=" + String(O_Snowing) +                "'>It&rsquo;s Snowing!</a></li>");
   client.println("      <li><a href='LED=" + String(O_CascadeRainbow) +         "'>Rainbow Cascade</a></li>");
-  client.println("      <li><a href='LED=" + String(O_TwinkleStar) +            "'>Twinkle, Twinkle Little Star</a></li>");
   client.println("      <li><a href='LED=" + String(O_SparkleBlorange) +        "'>Sparkle Blorange</a></li>");
-  client.println("      <li><a href='LED=" + String(O_Classic) +                "'>Classic</a></li>");
-  client.println("      <li><a href='LED=" + String(O_SlowCycle) +              "'>-</a></li>");
   client.println("        </ul>");
   client.println("      </div>");
   client.println("    </div>");
-  
+  client.println("(a combination of:");  
   client.println("    <div class=\"boxSectionOut\">");
   client.println("      <h2>Patterns</h2>");
   client.println("      <div class=\"boxSectionIn\">");
@@ -100,14 +97,12 @@ void doWeb() {
   client.println("      <li><a href='LED=" + String(O_Shimmer) +                "'>Shimmer</a></li>");
   client.println("      <li><a href='LED=" + String(O_Sparkle) +                "'>Sparkle</a></li>");
   client.println("      <li><a href='LED=" + String(O_Cascade) +                "'>Cascade</a></li>");
-  client.println("      <li><a href='LED=" + String(O_TwinCascade) +            "'>Twin Cascade</a></li>");
+//  client.println("      <li><a href='LED=" + String(O_TwinCascade) +            "'>Twin Cascade</a></li>"); // crashes the board!
   client.println("      <li><a href='LED=" + String(O_FireWater) +              "'>FireWater</a></li>");
-  client.println("      <li><a href='LED=" + String(O_SlowCycle) +              "'>-</a></li>");
-  client.println("      <li><a href='LED=" + String(O_SlowCycle) +              "'>-</a></li>");
   client.println("        </ul>");
   client.println("      </div>");
   client.println("    </div>");
-
+  client.println("and");
   client.println("    <div class=\"boxSectionOut\">");
   client.println("      <h2>Palettes</h2>");
   client.println("      <div class=\"boxSectionIn\">");
@@ -150,7 +145,7 @@ void doWeb() {
   client.println("        </ul>");
 
   client.println("        <form>");
-  client.println("          <label for='topStar'>Cycle palettes</label>");
+  client.println("          <label for='paletteCyle'>Cycle palettes</label>");
   client.print("          <input type='checkbox' id='paletteCyle' name='paletteCyle' "); if (bCyclePalettes){client.print(" checked");} client.println(" onchange='window.location.replace(\"LED=" + String(O_CyclePalettes) + "\");'>");
   client.println("        </form>");
   
@@ -161,6 +156,8 @@ void doWeb() {
   client.println("      <h2>Specials</h2>");
   client.println("      <div class=\"boxSectionIn\">");
   client.println("        <ul class='list'>");
+  client.println("      <li><a href='LED=" + String(O_TwinkleStar) +            "'>Twinkle, Twinkle Little Star</a></li>");
+  client.println("      <li><a href='LED=" + String(O_Classic) +                "'>Classic</a></li>");
   client.println("      <li><a href='LED=" + String(O_Fire) +                   "'>Fire</a></li>");
   client.println("      <li><a href='LED=" + String(O_Water) +                  "'>Water</a></li>");
   client.println("      <li><a href='LED=" + String(O_SantaHat) +               "'>Santa&rsquo;s Hat</a></li>");
@@ -231,3 +228,4 @@ void doWeb() {
   Serial.println("Client disconnected");
   Serial.println("");
 }
+
