@@ -1,9 +1,3 @@
-<!--
-HTTP/1.1 200 OK
-Content-Type: text/html
-
-<!DOCTYPE html>
--->
 <html>
   <head>
     <meta charset=\"UTF-8\">
@@ -13,102 +7,102 @@ Content-Type: text/html
     <div class="boxSectionOut">
       <h2>Controls</h2>
       <div class="boxSectionIn">
-      <ul id="list">
-        <li><a href='LED=" + String(O_PausePlay) + "'>Play/Pause</a></li>
-<!-- client.print("<li><a href='LED=" + String(O_PausePlay) + "'>");if (iLEDstatus == 2){client.print("Play");} else{client.print("Pause");}client.println("</a></li>"); -->
-
-        <li><a href='LED=" + String(O_FadeOut) + "'>Fade &lsquo;em up/out</a></li>
-      </ul>
-
-<label for='topStar'> Shine top star</label>
-<input type='checkbox' id='topStar' name='topStar'>
-    </div>
+        <ul id="list">
+          <li><a href='LED=" + String(O_PausePlay) + "'>Play/Pause</a></li>
+          <li><a href='LED=" + String(O_FadeOut) + "'>Fade &lsquo;em up/out</a></li>
+        </ul>
+        <form>
+          <label for='topStar'> Shine top star</label>
+          <input type='checkbox' id='topStar' name='topStar' onchange='window.location.replace("testMenu.html?LED=30");'>
+        </form>
+      </div>
     </div>
 
     <div class="boxSectionOut">
       <h2>Routines</h2>
       <div class="boxSectionIn">
-<form>
-    <label for="routines">Routine:</label>
-    <select name="routines" id="routines" onchange="alert()">
-      <option value="1">Twinkle Fairy</option>
-      <option value="2" selected>Rainbow Slow Cycle</option>
-      <option value="3">WhiteGold Sparkle</option>
-      <option value="4">Twinkle Holly</option>
-      <option value="5">Rainbow Trickle</option>
-      <option value="6">Sparkle Stars</option>
-      <option value="7">It&rsquo;s Snowing!</option>
-      <option value="8">Rainbow Cascade</option>
-      <option value="9">Twinkle, Twinkle Little Star</option>
-      <option value="10">Sparkle Blorange</option>
-      <option value="11">Classic</option>
-    </select>
+		  <form name="formRoutine" id="formRoutine">
+			<label for="routines">Routine:</label>
+			<!-- <select name="routines" id="routines" onchange='window.location.replace("LED='  '");'> -->
+			  <select name="routines" id="routines" onchange='alert("LED=");'>
+			  <option value="1">Twinkle Fairy</option>
+			  <option value="2" selected>Rainbow Slow Cycle</option>
+			  <option value="3">WhiteGold Sparkle</option>
+			  <option value="4">Twinkle Holly</option>
+			  <option value="5">Rainbow Trickle</option>
+			  <option value="6">Sparkle Stars</option>
+			  <option value="7">It&rsquo;s Snowing!</option>
+			  <option value="8">Rainbow Cascade</option>
+			  <option value="9">Twinkle, Twinkle Little Star</option>
+			  <option value="10">Sparkle Blorange</option>
+			  <option value="11">Classic</option>
+			</select>
+		  </form>
 
     <table>
-    <tr>
-      <td>(a combination of:</td><td>
-    <label for="patterns">Pattern:</label>
-    <select name="patterns" id="patterns" onchange="alert()">
-      <option value="">Still</option>
-      <option value="">Fade Palette</option>
-      <option value="" selected>Slow Cycle</option>
-      <option value="">Shuffle</option>
-      <option value="">Twinkle</option>
-      <option value="">Shimmer</option>
-      <option value="">Sparkle</option>
-      <option value="">Cascade</option>
-      <option value="">FireWater</option>
-    </select>
+      <tr>
+        <td>(a combination of:</td><td>
+      <label for="patterns">Pattern:</label>
+      <select name="patterns" id="patterns" onchange="alert()">
+        <option value="">Still</option>
+        <option value="">Fade Palette</option>
+        <option value="" selected>Slow Cycle</option>
+        <option value="">Shuffle</option>
+        <option value="">Twinkle</option>
+        <option value="">Shimmer</option>
+        <option value="">Sparkle</option>
+        <option value="">Cascade</option>
+        <option value="">FireWater</option>
+      </select>
 and</td><td>
-    <label for="palettes">Palette:</label>
-    <select name="palettes" id="palettes" onchange="alert()">
-      <option value="" selected>RainbowColors</option>
-      <option value="">RainbowStripeColors</option>
-      <option value="">RuGBY</option>
-      <option value="">PartyColors</option>
-      <option value="">Pastel</option>
-      <option value="">Dawn</option>
-      <option value="">Fire</option>
-      <option value="">Water</option>
-      <option value="">OceanColors</option>
-      <option value="">CloudColors</option>
-      <option value="">ForestColors</option>
-      <option value="">WhitePurple</option>
-      <option value="">WhiteGold</option>
-      <option value="">Blorange</option>
-      <option value="">Aquorange</option>
-      <option value="">Grurple</option>
-      <option value="">Ruthie&rsquo;s</option>
-      <option value="">AquaGray</option>
-      <option value="">Holly</option>
-      <option value="">Fairy Lights</option>
-      <option value="">Stars</option>
-      <option value="">Santa&rsquo;s Hat</option>
-      <option value="">Monochrome</option>
-      <option value="">RetroC9</option>
-      <option value="">BlueWhite</option>
-      <option value="">RedGreenWhite</option>
-      <option value="">Snow</option>
-      <option value="">Ice</option>
-      <option value="">AllWhite</option>
-      <option value="">AllBlacks</option>
-    </select>
-)</td>
-</tr>
+      <label for="palettes">Palette:</label>
+      <select name="palettes" id="palettes" onchange="alert()">
+        <option value="" selected>RainbowColors</option>
+        <option value="">RainbowStripeColors</option>
+        <option value="">RuGBY</option>
+        <option value="">PartyColors</option>
+        <option value="">Pastel</option>
+        <option value="">Dawn</option>
+        <option value="">Fire</option>
+        <option value="">Water</option>
+        <option value="">OceanColors</option>
+        <option value="">CloudColors</option>
+        <option value="">ForestColors</option>
+        <option value="">WhitePurple</option>
+        <option value="">WhiteGold</option>
+        <option value="">Blorange</option>
+        <option value="">Aquorange</option>
+        <option value="">Grurple</option>
+        <option value="">Ruthie&rsquo;s</option>
+        <option value="">AquaGray</option>
+        <option value="">Holly</option>
+        <option value="">Fairy Lights</option>
+        <option value="">Stars</option>
+        <option value="">Santa&rsquo;s Hat</option>
+        <option value="">Monochrome</option>
+        <option value="">RetroC9</option>
+        <option value="">BlueWhite</option>
+        <option value="">RedGreenWhite</option>
+        <option value="">Snow</option>
+        <option value="">Ice</option>
+        <option value="">AllWhite</option>
+        <option value="">AllBlacks</option>
+      </select>
+    </td>
+  </tr>
 
-<tr>
-  <td></td>
-  <td><label for='patternCycle'> Cycle Patterns</label>
-  <input type='checkbox' id='patternCycle' name='patternCycle'></td>
-  <td><label for='paletteCycle'> Cycle Palettes</label>
-    <input type='checkbox' id='paletteCycle' name='paletteCycle' onchange="window.location.href='LED=" + String(O_CyclePalettes) + "'">
-    <!-- client print("<li><a href='LED=" + String(O_CyclePalettes) + "'>if (bCyclePalettes){client.print("Don&rsquo;t }client.println("Cycle Palettes</a></li> -->
+  <tr>
+    <td></td>
+    <td><label for='patternCycle'> Cycle Patterns</label>
+    <input type='checkbox' id='patternCycle' name='patternCycle'></td>
+    <td><label for='paletteCycle'> Cycle Palettes</label>
+      <input type='checkbox' id='paletteCycle' name='paletteCycle' onchange="window.location.href='LED=" + String(O_CyclePalettes) + "'">
+      <!-- client print("<li><a href='LED=" + String(O_CyclePalettes) + "'>if (bCyclePalettes){client.print("Don&rsquo;t }client.println("Cycle Palettes</a></li> -->
 
-    <label for='paletteBlend'> Blend Palettes</label>
-    <input type='checkbox' id='paletteBlend' name='paletteBlend'></td>
-</tr>
-</table>
-
+      <label for='paletteBlend'> Blend Palettes</label>
+      <input type='checkbox' id='paletteBlend' name='paletteBlend'></td>
+  </tr>
+  </table>
 </form>
       </div>
     </div>
